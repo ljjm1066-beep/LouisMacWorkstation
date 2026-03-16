@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LM Workstation">
+<meta name="theme-color" content="#0d0e12">
+<title>Louis Mac Workstation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d0e12;--surf:#16181f;--surf2:#1e2028;--bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.13);--acc:#c8f064;--acc2:#64d4f0;--acc3:#f064a8;--acc4:#a064f0;--acc5:#f0a064;--txt:#f0f0ee;--muted:#888a94;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+html,body{height:100%;background:var(--bg);font-family:var(--sans);color:var(--txt);overscroll-behavior:none}
+.app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+.sb{background:var(--bg);padding:14px 20px 4px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.hdr{padding:10px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)}
+.hdr-brand{display:flex;flex-direction:column;gap:2px}
+.hdr-fullname{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--acc);letter-spacing:.02em}
+.hsub{font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+.hico{width:34px;height:34px;border-radius:10px;background:var(--surf2);border:1px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
+.body-wrap{display:flex;flex:1;overflow:hidden}
+.nav-wrap{display:flex;flex-direction:row;flex-shrink:0;transition:width .25s}
+.nav{display:flex;flex-direction:column;padding:8px 4px;gap:1px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;width:118px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);transition:width .25s}
+.nav-wrap.collapsed .nav{width:30px}
+.nav::-webkit-scrollbar{display:none}
+.nav-group{margin-bottom:2px}
+.nav-group-hdr{display:flex;align-items:center;gap:4px;padding:6px 6px 4px;cursor:pointer;border-radius:7px;transition:background .15s}
+.nav-group-hdr:active{background:var(--surf2)}
+.nav-grp-label{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;overflow:hidden;flex:1}
+.nav-grp-arrow{font-size:9px;color:var(--muted);flex-shrink:0;transition:transform .2s}
+.nav-group.folded .nav-grp-arrow{transform:rotate(-90deg)}
+.nav-grp-icon{font-size:13px;display:none;text-align:center;line-height:1;width:100%}
+.nav-wrap.collapsed .nav-grp-label{display:none}
+.nav-wrap.collapsed .nav-grp-arrow{display:none}
+.nav-wrap.collapsed .nav-grp-icon{display:block}
+.nav-group-body{overflow:hidden;transition:max-height .2s ease}
+.nav-group.folded .nav-group-body{max-height:0!important}
+.nbtn{width:100%;padding:6px 4px;border-radius:7px;font-family:var(--mono);font-size:9px;font-weight:500;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--muted);transition:all .15s;white-space:nowrap;text-align:center;line-height:1.3;overflow:hidden;text-overflow:ellipsis}
+.nbtn.on{background:rgba(200,240,100,.12);color:var(--acc);border-color:rgba(200,240,100,.2);font-weight:700}
+.nav-wrap.collapsed .nbtn{font-size:7px;padding:4px 2px}
+.nav-divider{height:1px;background:var(--bdr);margin:3px 4px}
+.nav-toggle{width:14px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.nav-toggle:active{background:var(--surf2)}
+.nav-toggle-arrow{font-size:8px;color:var(--muted);transition:transform .25s;line-height:1;user-select:none}
+.nav-wrap.collapsed .nav-toggle-arrow{transform:scaleX(-1)}
+.cnt{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--surf2) transparent}
+.cnt::-webkit-scrollbar{width:3px}
+.cnt::-webkit-scrollbar-thumb{background:var(--surf2);border-radius:2px}
+.sec{display:none}.sec.on{display:block}
+.shd{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--bdr)}
+.lhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.ltitle{font-family:var(--mono);font-size:14px;color:var(--acc)}
+.abtn{background:var(--acc);color:#0d0e12;border:none;border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer}
+.scard{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+.scard.draft::before{background:var(--acc3)}.scard.wip::before{background:var(--acc2)}
+.scardh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.sname{font-weight:600;font-size:14px;color:var(--txt)}
+.stag{font-size:10px;padding:3px 8px;border-radius:20px;font-family:var(--mono)}
+.tdone{background:rgba(200,240,100,.12);color:var(--acc)}.tdraft{background:rgba(240,100,168,.12);color:var(--acc3)}.twip{background:rgba(100,212,240,.12);color:var(--acc2)}
+.smeta{font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)}
+.sprev{font-size:12px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic}
+.modal-ov{position:absolute;inset:0;background:rgba(0,0,0,.88);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal-ov.op{display:flex}
+.modal{background:var(--surf);border:1px solid var(--bdr2);border-radius:20px 20px 0 0;padding:20px 20px 40px;width:100%;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.mhandle{width:36px;height:4px;background:var(--bdr2);border-radius:2px;margin:0 auto 16px}
+.mtitle{font-family:var(--mono);font-size:14px;color:var(--acc);margin-bottom:16px}
+.flbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-family:var(--mono)}
+.finp{width:100%;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:11px 12px;color:var(--txt);font-family:var(--sans);font-size:14px;margin-bottom:12px;resize:none;-webkit-appearance:none}
+.finp:focus{outline:none;border-color:var(--acc)}
+.fsel{width:100%;background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:11px 12px;color:var(--txt);font-family:var(--sans);font-size:14px;margin-bottom:12px;appearance:none}
+.fsel:focus{outline:none;border-color:var(--acc)}
+.macts{display:flex;gap:10px;margin-top:4px}
+.bsave{flex:1;background:var(--acc);color:#0d0e12;border:none;border-radius:10px;padding:13px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer}
+.bcancel{flex:1;background:var(--surf2);color:var(--muted);border:1px solid var(--bdr);border-radius:10px;padding:13px;font-family:var(--sans);font-size:14px;cursor:pointer}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.icard{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:12px;cursor:pointer;min-height:110px;display:flex;flex-direction:column}
+.icard:nth-child(4n+1){border-top:2px solid var(--acc)}.icard:nth-child(4n+2){border-top:2px solid var(--acc2)}.icard:nth-child(4n+3){border-top:2px solid var(--acc3)}.icard:nth-child(4n){border-top:2px solid var(--acc4)}
+.ictype{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;margin-bottom:6px}
+.ictxt{font-size:12px;color:var(--txt);line-height:1.5;flex:1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.icdate{font-size:10px;color:var(--muted);margin-top:8px;font-family:var(--mono)}
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ctab{padding:6px 11px;border-radius:8px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);white-space:nowrap}
+.ctab.on{background:var(--surf2);border-color:var(--acc);color:var(--acc)}
+.inst-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.itab{padding:5px 9px;border-radius:7px;font-size:11px;font-family:var(--mono);cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);white-space:nowrap}
+.itab.on{background:var(--surf2);color:var(--txt);border-color:var(--bdr2)}
+.eqcard{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:14px}
+.eqtitle{font-family:var(--mono);font-size:12px;color:var(--acc2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em}
+.brow{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 10px;background:var(--surf2);border-radius:8px}
+.blbl{font-family:var(--mono);font-size:11px;color:var(--acc);min-width:58px}
+.btype{font-size:11px;color:var(--muted);flex:1;line-height:1.4}
+.bval{font-family:var(--mono);font-size:11px;text-align:right;min-width:72px}
+.bval.cut{color:var(--acc3)}.bval.boost{color:var(--acc)}
+.tiprow{display:flex;gap:8px;margin-top:10px;padding:10px;background:rgba(200,240,100,.05);border-radius:8px;border:1px solid rgba(200,240,100,.1)}
+.tiptx{font-size:11px;color:var(--muted);line-height:1.5}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.cparam{background:var(--surf2);border-radius:8px;padding:10px}
+.cplbl{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.cpval{font-family:var(--mono);font-size:13px;color:var(--acc);font-weight:700}
+.cpval.s{color:var(--acc2)}
+.cnote{font-size:11px;color:var(--muted);line-height:1.5;font-style:italic;padding:8px 10px;background:var(--surf2);border-radius:8px}
+.chaincard{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:14px}
+.chaintitle{font-family:var(--mono);font-size:12px;margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em}
+.chainflow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.cnode{background:var(--surf2);border:1px solid var(--bdr2);border-radius:7px;padding:6px 9px;font-size:11px;font-family:var(--mono);color:var(--txt)}
+.cnode.inp{border-color:var(--acc2);color:var(--acc2)}.cnode.out{border-color:var(--acc);color:var(--acc)}
+.carr{color:var(--muted);font-size:13px}
+.plug-block{background:var(--surf2);border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--acc4)}
+.plug-name{font-family:var(--mono);font-size:12px;color:var(--acc4);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.plug-badge{font-size:9px;padding:2px 7px;border-radius:20px;font-family:var(--mono);background:rgba(160,100,240,.15);color:var(--acc4)}
+.plug-badge.waves{background:rgba(100,212,240,.12);color:var(--acc2)}
+.plug-badge.fab{background:rgba(200,240,100,.12);color:var(--acc)}
+.plug-badge.uad{background:rgba(240,100,168,.12);color:var(--acc3)}
+.pdrow{display:flex;justify-content:space-between;padding:5px 8px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,.03)}
+.pdlbl{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.pdval{font-size:11px;color:var(--txt);font-family:var(--mono);text-align:right;max-width:58%;word-break:break-word}
+.det-view{display:none}.det-view.op{display:block}
+.bbtn{display:flex;align-items:center;gap:6px;color:var(--acc);font-size:13px;cursor:pointer;margin-bottom:16px;font-family:var(--mono);background:none;border:none;padding:0}
+.lbody{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:16px;font-size:13px;line-height:1.8;color:var(--txt)}
+.lslbl{font-family:var(--mono);font-size:11px;color:var(--acc);text-transform:uppercase;margin:14px 0 4px;letter-spacing:.1em}
+.empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:13px}
+.sec-tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--bdr);padding-bottom:12px}
+.stab{flex:1;padding:8px 4px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);text-align:center}
+.stab.on{background:var(--surf2);border-color:var(--acc2);color:var(--acc2)}
+.subsec{display:none}.subsec.on{display:block}
+.vm-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px}
+.vm-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.vm-title{font-size:13px;font-weight:600;color:var(--txt)}
+.vm-date{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.vm-player{display:flex;align-items:center;gap:10px}
+.vm-play{width:36px;height:36px;border-radius:50%;background:var(--acc);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#0d0e12;flex-shrink:0}
+.vm-bar{flex:1;height:4px;background:var(--surf2);border-radius:2px;position:relative;cursor:pointer}
+.vm-progress{height:100%;background:var(--acc);border-radius:2px;width:0%;transition:width .1s}
+.vm-time{font-size:10px;color:var(--muted);font-family:var(--mono);min-width:36px;text-align:right}
+.vm-note{font-size:12px;color:var(--muted);margin-top:8px;font-style:italic;line-height:1.5}
+.vm-del{background:none;border:none;color:var(--acc3);font-size:11px;cursor:pointer;font-family:var(--mono);padding:0;margin-top:8px}
+.rec-btn{width:100%;padding:14px;border-radius:12px;background:var(--surf);border:2px solid var(--acc3);color:var(--acc3);font-family:var(--mono);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:all .2s}
+.rec-btn.recording{background:rgba(240,100,168,.1);border-color:var(--acc3);animation:pulse 1s infinite}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:var(--acc3);flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.gs-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:12px}
+.gs-title{font-family:var(--mono);font-size:12px;color:var(--acc5);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em}
+.gs-meter{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 10px;background:var(--surf2);border-radius:8px}
+.gs-lbl{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:90px}
+.gs-bar-wrap{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.gs-bar{height:100%;border-radius:4px}
+.gs-val{font-family:var(--mono);font-size:11px;min-width:72px;text-align:right}
+.gs-val.ok{color:var(--acc)}.gs-val.warn{color:var(--acc5)}.gs-val.hot{color:var(--acc3)}
+.gs-tip{font-size:11px;color:var(--muted);line-height:1.5;padding:8px 10px;background:rgba(240,160,100,.05);border-radius:8px;border:1px solid rgba(240,160,100,.1);margin-top:8px}
+.mix-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:12px}
+.mix-title{font-family:var(--mono);font-size:12px;color:var(--acc3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em}
+.mix-step{display:flex;gap:10px;padding:8px 10px;background:var(--surf2);border-radius:8px;margin-bottom:8px;align-items:flex-start}
+.mix-num{font-family:var(--mono);font-size:11px;color:var(--acc3);min-width:22px;margin-top:1px}
+.mix-txt{font-size:12px;color:var(--txt);line-height:1.5;flex:1}
+.mix-txt span{color:var(--acc);font-family:var(--mono);font-size:11px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sb"><span id="clock">9:41</span><span>songwriter / producer</span></div>
+<div class="hdr">
+  <div class="hdr-brand">
+    <img src="data:image/png;base64,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" alt="Louis Mac" style="width:140px;height:auto;display:block;margin-bottom:2px"/>
+    <div class="hsub">Songwriter &amp; Producer Suite</div>
+  </div>
+  <div class="hico">🎛</div>
+</div>
+<div class="body-wrap">
+<div class="nav-wrap" id="nav-wrap">
+  <div class="nav" id="nav">
+
+    <div class="nav-group open" id="grp-writing">
+      <div class="nav-group-hdr" data-grp="writing">
+        <span class="nav-grp-icon" style="color:var(--acc)">&#9834;</span>
+        <span class="nav-grp-label" style="color:var(--acc)">Writing</span>
+        <span class="nav-grp-arrow">&#9660;</span>
+      </div>
+      <div class="nav-group-body" id="body-writing" style="max-height:200px">
+        <button class="nbtn on" data-s="lyrics">Lyrics</button>
+        <button class="nbtn" data-s="ideas">Ideas</button>
+        <button class="nbtn" data-s="chords">Chords</button>
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-group open" id="grp-mixing">
+      <div class="nav-group-hdr" data-grp="mixing">
+        <span class="nav-grp-icon" style="color:var(--acc2)">&#9775;</span>
+        <span class="nav-grp-label" style="color:var(--acc2)">Mixing</span>
+        <span class="nav-grp-arrow">&#9660;</span>
+      </div>
+      <div class="nav-group-body" id="body-mixing" style="max-height:300px">
+        <button class="nbtn" data-s="eq">EQ</button>
+        <button class="nbtn" data-s="comp">Comp</button>
+        <button class="nbtn" data-s="fx">FX Chains</button>
+        <button class="nbtn" data-s="gain">Gain</button>
+        <button class="nbtn" data-s="mixdown">Mixdown</button>
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-group open" id="grp-organiser">
+      <div class="nav-group-hdr" data-grp="organiser">
+        <span class="nav-grp-icon" style="color:var(--acc4)">&#9998;</span>
+        <span class="nav-grp-label" style="color:var(--acc4)">Organiser</span>
+        <span class="nav-grp-arrow">&#9660;</span>
+      </div>
+      <div class="nav-group-body" id="body-organiser" style="max-height:200px">
+        <button class="nbtn" data-s="cal">Calendar</button>
+        <button class="nbtn" data-s="todo">To Do</button>
+        <button class="nbtn" data-s="email">Email</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="nav-toggle" id="nav-toggle"><span class="nav-toggle-arrow">&#9664;</span></div>
+</div>
+<div class="cnt" id="cnt">
+
+<!-- LYRICS -->
+<div class="sec on" id="sec-lyrics">
+  <div id="llist">
+    <div class="sec-tabs">
+      <button class="stab on" data-sub="songs">Songs</button>
+      <button class="stab" data-sub="memos">Voice Memos</button>
+    </div>
+    <div class="subsec on" id="sub-songs">
+      <div class="lhdr"><div class="ltitle">Songs</div><button class="abtn" id="opn-song">+ New</button></div>
+      <div id="scont"></div>
+    </div>
+    <div class="subsec" id="sub-memos">
+      <div class="lhdr"><div class="ltitle">Voice Memos</div></div>
+      <button class="rec-btn" id="rec-btn"><div class="rec-dot"></div><span id="rec-label">Hold to Record</span></button>
+      <div id="memo-name-row" style="display:none;margin-bottom:12px">
+        <input class="finp" id="memo-name-inp" placeholder="Name this memo..." style="margin-bottom:8px"/>
+        <div style="display:flex;gap:8px">
+          <button class="bsave" id="memo-save-btn" style="flex:1;padding:10px;font-size:13px">Save Memo</button>
+          <button class="bcancel" id="memo-discard-btn" style="flex:1;padding:10px;font-size:13px">Discard</button>
+        </div>
+      </div>
+      <div id="memo-cont"></div>
+    </div>
+  </div>
+  <div class="det-view" id="sdet">
+    <button class="bbtn" id="backbtn">← Back</button>
+    <div id="sdetcont"></div>
+  </div>
+</div>
+
+<!-- IDEAS -->
+<div class="sec" id="sec-ideas">
+  <div class="lhdr"><div class="ltitle">Quick Ideas</div><button class="abtn" id="opn-idea">+ Capture</button></div>
+  <div class="igrid" id="icont"></div>
+</div>
+
+<!-- EQ -->
+<div class="sec" id="sec-eq">
+  <div class="shd">EQ Reference</div>
+  <div class="cat-tabs" id="eq-cats"></div>
+  <div class="inst-tabs" id="eq-insts"></div>
+  <div id="eq-body"></div>
+</div>
+
+<!-- COMP -->
+<div class="sec" id="sec-comp">
+  <div class="shd">Compression Settings</div>
+  <div class="cat-tabs" id="comp-cats"></div>
+  <div class="inst-tabs" id="comp-insts"></div>
+  <div id="comp-body"></div>
+</div>
+
+<!-- FX CHAINS -->
+<div class="sec" id="sec-fx">
+  <div class="shd">FX &amp; Processing Chains</div>
+  <div class="cat-tabs" id="fx-cats"></div>
+  <div class="inst-tabs" id="fx-insts"></div>
+  <div id="fx-body"></div>
+</div>
+
+<!-- GAIN STAGING -->
+<div class="sec" id="sec-gain">
+  <div class="shd">Gain Staging Guide</div>
+  <div class="cat-tabs" id="gs-cats"></div>
+  <div id="gs-body"></div>
+</div>
+
+<!-- MIXDOWN -->
+<div class="sec" id="sec-mixdown">
+  <div class="shd">Mixdown Checklist</div>
+  <div class="cat-tabs" id="mix-cats"></div>
+  <div id="mix-body"></div>
+</div>
+
+<!-- CHORDS -->
+<div class="sec" id="sec-chords">
+  <div class="shd">Chord Progressions</div>
+  <div id="chord-key-tabs" class="cat-tabs"></div>
+  <div id="chord-mood-tabs" class="cat-tabs" style="margin-top:-4px"></div>
+  <div id="chord-body"></div>
+</div>
+
+<!-- CALENDAR -->
+<div class="sec" id="sec-cal">
+  <div class="shd">Calendar</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <button class="abtn" id="cal-prev" style="padding:6px 12px;font-size:13px">&#8592;</button>
+    <div id="cal-month" style="font-family:var(--mono);font-size:13px;color:var(--acc)"></div>
+    <button class="abtn" id="cal-next" style="padding:6px 12px;font-size:13px">&#8594;</button>
+  </div>
+  <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-family:var(--mono);font-size:11px;color:var(--muted)" id="cal-sel-label">Select a day</div>
+    <button class="abtn" id="opn-event" style="padding:6px 12px;font-size:11px">+ Event</button>
+  </div>
+  <div id="cal-events-list"></div>
+</div>
+
+<!-- TODO -->
+<div class="sec" id="sec-todo">
+  <div class="shd">To Do</div>
+  <div style="display:flex;gap:6px;margin-bottom:14px">
+    <button class="todo-tab on" data-list="music" style="flex:1;padding:8px 4px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;border:1px solid rgba(200,240,100,.3);background:rgba(200,240,100,.1);color:var(--acc);text-align:center">Music</button>
+    <button class="todo-tab" data-list="life" style="flex:1;padding:8px 4px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);text-align:center">Life</button>
+    <button class="todo-tab" data-list="school" style="flex:1;padding:8px 4px;border-radius:8px;font-family:var(--mono);font-size:11px;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);text-align:center">School</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <input class="finp" id="todo-inp" placeholder="Add a task..." style="flex:1;margin-bottom:0;padding:10px 12px"/>
+    <button class="abtn" id="todo-add-btn" style="white-space:nowrap">Add</button>
+  </div>
+  <div id="todo-list"></div>
+</div>
+
+<!-- EMAIL -->
+<div class="sec" id="sec-email">
+  <div class="shd">Email</div>
+  <div style="padding:8px 0">
+    <a href="/cdn-cgi/l/email-protection#db96aea8b2b89b97b4aeb2a896bab8f5b8b4b6" class="abtn" style="display:block;text-align:center;padding:14px;border-radius:10px;font-size:14px;text-decoration:none;margin-bottom:10px"><span class="__cf_email__" data-cfemail="a1ecd4d2c8c2e1edced4c8d2ecc0c28fc2cecc">[email&#160;protected]</span></a>
+    <a href="https://webmail.networksolutions.com" target="_blank" class="abtn" style="display:block;text-align:center;padding:14px;border-radius:10px;font-size:14px;text-decoration:none;background:var(--surf2);color:var(--txt);border:1px solid var(--bdr2)">Webmail Login</a>
+  </div>
+</div>
+
+</div>
+</div>
+</div><!-- /body-wrap -->
+
+<!-- Song Modal -->
+<div class="modal-ov" id="song-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">New Song</div>
+    <div class="flbl">Title</div><input class="finp" id="si-title" placeholder="Song title..."/>
+    <div class="flbl">Genre / Vibe</div><input class="finp" id="si-genre" placeholder="e.g. Dark R&B, Lo-fi Trap..."/>
+    <div class="flbl">Key &amp; BPM</div><input class="finp" id="si-key" placeholder="e.g. Am, 90 BPM"/>
+    <div class="flbl">Status</div>
+    <select class="fsel" id="si-status"><option value="draft">Draft</option><option value="wip">WIP</option><option value="done">Done</option></select>
+    <div class="flbl">Lyrics / Notes</div>
+    <textarea class="finp" id="si-lyrics" rows="7" placeholder="[Verse 1]&#10;...&#10;&#10;[Chorus]&#10;..."></textarea>
+    <div class="macts"><button class="bcancel" id="cx-song">Cancel</button><button class="bsave" id="sv-song">Save Song</button></div>
+  </div>
+</div>
+
+<!-- Idea Modal -->
+<div class="modal-ov" id="idea-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Capture Idea</div>
+    <div class="flbl">Type</div>
+    <select class="fsel" id="ii-type">
+      <option value="hook">Hook / Melody</option>
+      <option value="lyric">Lyric Line</option>
+      <option value="concept">Song Concept</option>
+      <option value="chord">Chord Progression</option>
+      <option value="beat">Beat / Rhythm</option>
+      <option value="sample">Sample Idea</option>
+    </select>
+    <div class="flbl">Idea</div>
+    <textarea class="finp" id="ii-text" rows="5" placeholder="Capture it before you lose it..."></textarea>
+    <div class="macts"><button class="bcancel" id="cx-idea">Cancel</button><button class="bsave" id="sv-idea">Save Idea</button></div>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal-ov" id="event-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">Add Event</div>
+    <div class="flbl">Title</div><input class="finp" id="ev-title" placeholder="Event name..."/>
+    <div class="flbl">Date</div><input class="finp" id="ev-date" type="date"/>
+    <div class="flbl">Time (optional)</div><input class="finp" id="ev-time" type="time"/>
+    <div class="flbl">Type</div>
+    <select class="fsel" id="ev-type">
+      <option value="session">Studio Session</option>
+      <option value="deadline">Deadline</option>
+      <option value="release">Release</option>
+      <option value="collab">Collab</option>
+      <option value="rehearsal">Rehearsal</option>
+      <option value="gig">Gig</option>
+      <option value="other">Other</option>
+    </select>
+    <div class="macts"><button class="bcancel" id="cx-event">Cancel</button><button class="bsave" id="sv-event">Save Event</button></div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const CATS={
+  vocals:{label:"Vocals",insts:["Lead Vocal (M)","Lead Vocal (F)","BG Vocals","Vocal Doubles","Vocal Bus"]},
+  drums:{label:"Drums",insts:["Kick","Snare","Closed Hat","Open Hat","Percussion","Drum Bus"]},
+  bass:{label:"Bass",insts:["Electric Bass","Synth Bass","Sub Bass","Bass Bus"]},
+  guitar:{label:"Guitar",insts:["Clean Guitar","Distorted Guitar","Acoustic Guitar","Plucked","Guitar Bus"]},
+  keys:{label:"Keys & Synths",insts:["Bright Pop Piano","Warm Ballad Piano","Pluck Synth","Pad","Lead Synth","Arp Synth","Organ","Pop Strings","Keys & Synth Bus"]},
+  mix:{label:"Mix",insts:["Mix Bus"]}
+};
+
+const EQ={
+"Lead Vocal (M)":{bands:[{f:"80 Hz",t:"HPF",a:"Remove chest rumble & plosives",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Muddiness / boxiness",v:"-2 to -4 dB",c:"cut"},{f:"400–600 Hz",t:"Dip",a:"Honky male chest tone",v:"-2 to -3 dB",c:"cut"},{f:"1–2 kHz",t:"Cut",a:"Nasality / harshness",v:"-1 to -3 dB",c:"cut"},{f:"3–5 kHz",t:"Boost",a:"Presence & intelligibility",v:"+2 to +4 dB",c:"boost"},{f:"10–16 kHz",t:"Shelf",a:"Air and brilliance",v:"+1 to +3 dB",c:"boost"}],tip:"De-esser sits after EQ targeting 6–9 kHz. A gentle high-shelf air boost above 12 kHz opens the vocal without adding harshness."},
+"Lead Vocal (F)":{bands:[{f:"100 Hz",t:"HPF",a:"Remove low rumble",v:"High-pass",c:"cut"},{f:"150–250 Hz",t:"Cut",a:"Reduce boxiness",v:"-2 to -3 dB",c:"cut"},{f:"800 Hz",t:"Dip",a:"Hollow nasal body",v:"-1 to -2 dB",c:"cut"},{f:"3–5 kHz",t:"Boost",a:"Clarity & presence",v:"+2 to +3 dB",c:"boost"},{f:"6–9 kHz",t:"De-ess",a:"Sibilance control",v:"-3 to -6 dB GR",c:"cut"},{f:"12–16 kHz",t:"Shelf",a:"Silky air",v:"+2 to +4 dB",c:"boost"}],tip:"Female vocals often have natural upper-mid brightness. Be careful boosting 3–5 kHz — cut first if sibilance is already present."},
+"BG Vocals":{bands:[{f:"120 Hz",t:"HPF",a:"Clean up low end",v:"High-pass",c:"cut"},{f:"300–500 Hz",t:"Cut",a:"Reduce congestion",v:"-3 to -5 dB",c:"cut"},{f:"2–3 kHz",t:"Cut",a:"Sit behind lead vocal",v:"-2 to -3 dB",c:"cut"},{f:"8–12 kHz",t:"Shelf",a:"Airy shimmer in stereo field",v:"+2 to +3 dB",c:"boost"}],tip:"Roll off lows aggressively and tuck BG vocals 2–3 dB lower in presence than the lead. They should be felt, not heard."},
+"Vocal Doubles":{bands:[{f:"150 Hz",t:"HPF",a:"Remove body",v:"High-pass",c:"cut"},{f:"400–600 Hz",t:"Cut",a:"Remove warmth overlap with lead",v:"-4 to -6 dB",c:"cut"},{f:"2–4 kHz",t:"Cut",a:"Thin to avoid clash",v:"-2 to -3 dB",c:"cut"},{f:"8–14 kHz",t:"Shelf",a:"Glittery shimmer",v:"+2 to +4 dB",c:"boost"}],tip:"Pan doubles wide (L40/R40). HPF hard and remove body so they add width without fighting the centre lead."},
+"Vocal Bus":{bands:[{f:"80 Hz",t:"HPF",a:"Final clean-up pass",v:"High-pass",c:"cut"},{f:"200 Hz",t:"Cut",a:"Tighten shared low-mid buildup",v:"-1 to -2 dB",c:"cut"},{f:"3–5 kHz",t:"Trim",a:"Control harshness across all vox",v:"-1 to +1 dB",c:"boost"},{f:"10–14 kHz",t:"Shelf",a:"Unified air across the stack",v:"+1 to +2 dB",c:"boost"}],tip:"Keep bus EQ subtle. Bus is for glue and final shaping only — individual tracks do the heavy lifting."},
+"Kick":{bands:[{f:"20–60 Hz",t:"Boost",a:"Sub body & weight",v:"+2 to +5 dB",c:"boost"},{f:"200–350 Hz",t:"Cut",a:"Cardboard boxiness",v:"-4 to -6 dB",c:"cut"},{f:"2–4 kHz",t:"Boost",a:"Beater click & punch",v:"+2 to +4 dB",c:"boost"},{f:"8–10 kHz",t:"Boost",a:"Snap & attack transient",v:"+1 to +2 dB",c:"boost"}],tip:"HPF below 30 Hz to cut sub rumble. Narrow cut at 350 Hz solves cardboard tone immediately."},
+"Snare":{bands:[{f:"100–150 Hz",t:"Boost",a:"Weight & thump",v:"+2 to +3 dB",c:"boost"},{f:"300–500 Hz",t:"Cut",a:"Boxy ring reduction",v:"-3 to -5 dB",c:"cut"},{f:"2–4 kHz",t:"Boost",a:"Crack and attack",v:"+3 to +5 dB",c:"boost"},{f:"10–12 kHz",t:"Boost",a:"Sizzle & snap",v:"+1 to +3 dB",c:"boost"}],tip:"Sweep a narrow boost around 200–400 Hz to find the ring, then cut it. The difference is dramatic."},
+"Closed Hat":{bands:[{f:"200 Hz",t:"HPF",a:"Remove low rumble bleed",v:"High-pass",c:"cut"},{f:"300–600 Hz",t:"Cut",a:"Clunky metallic body",v:"-3 to -5 dB",c:"cut"},{f:"8–12 kHz",t:"Boost",a:"Crisp tsss attack",v:"+2 to +3 dB",c:"boost"},{f:"14–18 kHz",t:"Shelf",a:"Airiness",v:"+1 to +2 dB",c:"boost"}],tip:"Closed hats should be felt more than heard. Keep them relatively low in the mix and let the air frequencies do the work."},
+"Open Hat":{bands:[{f:"250 Hz",t:"HPF",a:"Remove kick & snare bleed",v:"High-pass",c:"cut"},{f:"500–800 Hz",t:"Cut",a:"Harsh clang",v:"-3 to -5 dB",c:"cut"},{f:"6–10 kHz",t:"Boost",a:"Wash & shimmer",v:"+2 to +3 dB",c:"boost"},{f:"14–18 kHz",t:"Shelf",a:"Cymbal air",v:"+1 to +3 dB",c:"boost"}],tip:"Use a slower attack on your gate to let the natural wash breathe. High-pass aggressively to cut drum bleed."},
+"Percussion":{bands:[{f:"100–150 Hz",t:"HPF",a:"Remove low-end bleed",v:"High-pass",c:"cut"},{f:"400–600 Hz",t:"Cut",a:"Woody/boxy midrange",v:"-2 to -4 dB",c:"cut"},{f:"2–4 kHz",t:"Boost",a:"Snap and click attack",v:"+1 to +3 dB",c:"boost"},{f:"8–12 kHz",t:"Boost",a:"Crisp definition",v:"+1 to +2 dB",c:"boost"}],tip:"Heavy HPF and presence boost makes percussion cut through without fighting the main drums."},
+"Drum Bus":{bands:[{f:"30 Hz",t:"HPF",a:"Remove sub rumble",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Shared boxiness across kit",v:"-1 to -2 dB",c:"cut"},{f:"60 Hz",t:"Boost",a:"Unified sub punch",v:"+1 to +2 dB",c:"boost"},{f:"8–12 kHz",t:"Shelf",a:"Kit air & overhead sparkle",v:"+1 to +2 dB",c:"boost"}],tip:"Light touches only on the bus. A small low shelf adds kit glue without pumping."},
+"Electric Bass":{bands:[{f:"30 Hz",t:"HPF",a:"Stop sub rumble",v:"High-pass",c:"cut"},{f:"160–250 Hz",t:"Cut",a:"Mud & flabbiness",v:"-3 to -5 dB",c:"cut"},{f:"700 Hz–1 kHz",t:"Boost",a:"Midrange growl & note definition",v:"+1 to +2 dB",c:"boost"},{f:"3–5 kHz",t:"Boost",a:"String/pick attack",v:"+1 to +2 dB",c:"boost"}],tip:"Blend DI and amp tracks for character. Sidechain compress to the kick for a groove-locked low end."},
+"Synth Bass":{bands:[{f:"20–30 Hz",t:"HPF",a:"Sub rumble control",v:"High-pass",c:"cut"},{f:"40–80 Hz",t:"Boost",a:"Tight sub presence",v:"+2 to +4 dB",c:"boost"},{f:"200–350 Hz",t:"Cut",a:"Muddiness",v:"-3 to -5 dB",c:"cut"},{f:"1–2 kHz",t:"Boost",a:"Synth character / saw edge",v:"+1 to +2 dB",c:"boost"}],tip:"Soft-clip or overdrive for harmonics so it translates on small speakers."},
+"Sub Bass":{bands:[{f:"20 Hz",t:"HPF",a:"Infra-sub removal",v:"High-pass",c:"cut"},{f:"40–60 Hz",t:"Boost",a:"Core sub weight",v:"+3 to +5 dB",c:"boost"},{f:"80–120 Hz",t:"Cut",a:"Reduce mid-bass bloom",v:"-2 to -4 dB",c:"cut"},{f:"200 Hz+",t:"LPF",a:"Keep it pure sub only",v:"Low-pass",c:"cut"}],tip:"Sub bass should be mono. Add gentle saturation for small speaker translation."},
+"Bass Bus":{bands:[{f:"25 Hz",t:"HPF",a:"Ultra-low clean-up",v:"High-pass",c:"cut"},{f:"150–200 Hz",t:"Cut",a:"Accumulated mud",v:"-1 to -2 dB",c:"cut"},{f:"60 Hz",t:"Boost",a:"Shared sub cohesion",v:"+1 to +2 dB",c:"boost"},{f:"1 kHz",t:"Boost",a:"Note definition",v:"+1 dB",c:"boost"}],tip:"Check your bass bus mono at all times. Ensure sub frequencies (below 80 Hz) are centred and not fighting the kick."},
+"Clean Guitar":{bands:[{f:"80–100 Hz",t:"HPF",a:"Remove low-end rumble",v:"High-pass",c:"cut"},{f:"300–500 Hz",t:"Cut",a:"Boxiness",v:"-3 to -5 dB",c:"cut"},{f:"1–2 kHz",t:"Boost",a:"String definition & bite",v:"+1 to +2 dB",c:"boost"},{f:"5–8 kHz",t:"Boost",a:"Presence & sparkle",v:"+1 to +2 dB",c:"boost"}],tip:"Cut before boosting. If it sounds boxy, there's too much 300–500 Hz."},
+"Distorted Guitar":{bands:[{f:"100 Hz",t:"HPF",a:"Remove low-end rumble",v:"High-pass",c:"cut"},{f:"300–500 Hz",t:"Cut",a:"Fizzy boxiness",v:"-4 to -6 dB",c:"cut"},{f:"2–4 kHz",t:"Boost",a:"Aggression & cut-through",v:"+2 to +3 dB",c:"boost"},{f:"8 kHz",t:"Cut",a:"Harsh fizz reduction",v:"-2 to -3 dB",c:"cut"}],tip:"Heavy distortion creates massive low-mid build-up. HPF at 100+ Hz and carve 300–500 Hz to reclaim clarity."},
+"Acoustic Guitar":{bands:[{f:"80 Hz",t:"HPF",a:"Stage rumble / body thump",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Boxy body resonance",v:"-2 to -4 dB",c:"cut"},{f:"1–2 kHz",t:"Boost",a:"Pick attack & presence",v:"+1 to +2 dB",c:"boost"},{f:"8–12 kHz",t:"Shelf",a:"String shimmer & air",v:"+1 to +3 dB",c:"boost"}],tip:"Mic placement matters more than EQ. A room mic blended with a contact mic adds dimension."},
+"Plucked":{bands:[{f:"100 Hz",t:"HPF",a:"Remove unwanted low body",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Woolly muddiness",v:"-2 to -3 dB",c:"cut"},{f:"2–3 kHz",t:"Boost",a:"Pluck attack / articulation",v:"+2 to +3 dB",c:"boost"},{f:"8–12 kHz",t:"Boost",a:"String brightness",v:"+1 to +2 dB",c:"boost"}],tip:"Fast-attack compressor evens out dynamics without killing the pluck character."},
+"Guitar Bus":{bands:[{f:"80 Hz",t:"HPF",a:"Final shared low clean-up",v:"High-pass",c:"cut"},{f:"300–500 Hz",t:"Cut",a:"Collective boxiness",v:"-1 to -3 dB",c:"cut"},{f:"2–3 kHz",t:"Trim",a:"Shared presence balance",v:"±1 dB",c:"boost"},{f:"10 kHz",t:"Shelf",a:"Collective air",v:"+1 to +2 dB",c:"boost"}],tip:"Guitar bus glue comp (2:1, slow attack) makes rhythm and lead guitars sit together."},
+"Bright Pop Piano":{bands:[{f:"60–80 Hz",t:"HPF",a:"Low rumble removal",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Muddiness",v:"-2 to -3 dB",c:"cut"},{f:"1–2 kHz",t:"Boost",a:"Hammer attack / clarity",v:"+1 to +2 dB",c:"boost"},{f:"8–14 kHz",t:"Shelf",a:"Bright sparkle & sheen",v:"+2 to +4 dB",c:"boost"}],tip:"High-pass firmly and boost the top-end shelf for that classic bright pop piano tone."},
+"Warm Ballad Piano":{bands:[{f:"40 Hz",t:"HPF",a:"Sub rumble",v:"High-pass",c:"cut"},{f:"100–150 Hz",t:"Boost",a:"Warm body & richness",v:"+2 to +3 dB",c:"boost"},{f:"400–600 Hz",t:"Cut",a:"Honkiness",v:"-2 to -3 dB",c:"cut"},{f:"4–6 kHz",t:"Boost",a:"Note definition without brightness",v:"+1 to +2 dB",c:"boost"}],tip:"Preserve the lows and mids. Avoid aggressive high shelves — warmth is the goal."},
+"Pluck Synth":{bands:[{f:"80–120 Hz",t:"HPF",a:"Unnecessary sub weight",v:"High-pass",c:"cut"},{f:"200–400 Hz",t:"Cut",a:"Muddiness",v:"-2 to -4 dB",c:"cut"},{f:"1–3 kHz",t:"Boost",a:"Pluck transient & character",v:"+2 to +3 dB",c:"boost"},{f:"8–12 kHz",t:"Boost",a:"Sparkle & definition",v:"+1 to +2 dB",c:"boost"}],tip:"Automate a LPF sweep opening over the pluck synth for drops or builds."},
+"Pad":{bands:[{f:"100–200 Hz",t:"HPF",a:"Sub clutter",v:"High-pass",c:"cut"},{f:"200–400 Hz",t:"Cut",a:"Mud accumulation",v:"-2 to -4 dB",c:"cut"},{f:"2–4 kHz",t:"Cut",a:"Harshness — leave vocal space",v:"-1 to -2 dB",c:"cut"},{f:"8–16 kHz",t:"Shelf",a:"Shimmer & lush air",v:"+1 to +3 dB",c:"boost"}],tip:"Pads are texture, not melody. Push them wide and automate the EQ filter for movement."},
+"Lead Synth":{bands:[{f:"80 Hz",t:"HPF",a:"Remove sub weight",v:"High-pass",c:"cut"},{f:"200–400 Hz",t:"Cut",a:"Muddiness",v:"-2 to -3 dB",c:"cut"},{f:"2–4 kHz",t:"Boost",a:"Lead presence & cut-through",v:"+2 to +4 dB",c:"boost"},{f:"8–12 kHz",t:"Boost",a:"Brightness & attack",v:"+1 to +2 dB",c:"boost"}],tip:"Lead synths compete with vocals. Automate the lead down 2–3 dB when the vocal is present."},
+"Arp Synth":{bands:[{f:"100 Hz",t:"HPF",a:"Remove low accumulation",v:"High-pass",c:"cut"},{f:"300–500 Hz",t:"Cut",a:"Clutter in mid-range",v:"-2 to -4 dB",c:"cut"},{f:"2–4 kHz",t:"Boost",a:"Note clarity & twinkle",v:"+1 to +2 dB",c:"boost"},{f:"10–14 kHz",t:"Shelf",a:"Silky top-end shimmer",v:"+1 to +2 dB",c:"boost"}],tip:"Heavy HPF and stereo widening keeps arps in the upper frequency field without clogging the mix."},
+"Organ":{bands:[{f:"40–60 Hz",t:"HPF",a:"Pedal note sub rumble",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Boxiness / honk",v:"-2 to -4 dB",c:"cut"},{f:"800 Hz–1.5 kHz",t:"Boost",a:"Key-click & drawbar presence",v:"+1 to +2 dB",c:"boost"},{f:"4–6 kHz",t:"Boost",a:"Definition",v:"+1 to +2 dB",c:"boost"}],tip:"Rotary speaker simulation (Leslie) is essential. Overdrive lightly before the Leslie sim."},
+"Pop Strings":{bands:[{f:"80 Hz",t:"HPF",a:"Low-end bleed",v:"High-pass",c:"cut"},{f:"200–400 Hz",t:"Cut",a:"Boxy body resonance",v:"-2 to -3 dB",c:"cut"},{f:"1–2 kHz",t:"Boost",a:"Bow attack & articulation",v:"+1 to +2 dB",c:"boost"},{f:"8–14 kHz",t:"Shelf",a:"Silky string sheen",v:"+2 to +4 dB",c:"boost"}],tip:"Gentle high-shelf gives classic pop strings shimmer. Cut 3–5 kHz if they compete with the lead vocal."},
+"Keys & Synth Bus":{bands:[{f:"60 Hz",t:"HPF",a:"Accumulated sub weight",v:"High-pass",c:"cut"},{f:"200–300 Hz",t:"Cut",a:"Shared muddiness",v:"-1 to -2 dB",c:"cut"},{f:"3–5 kHz",t:"Trim",a:"Control shared harshness",v:"-1 to +1 dB",c:"boost"},{f:"10–14 kHz",t:"Shelf",a:"Collective air",v:"+1 to +2 dB",c:"boost"}],tip:"A gentle glue comp (1.5:1–2:1) knits pads, leads and arps together. Keep bus moves subtle."},
+"Mix Bus":{bands:[{f:"20–30 Hz",t:"HPF",a:"Sub infra-noise",v:"High-pass",c:"cut"},{f:"200 Hz",t:"Cut",a:"Accumulated mud",v:"-0.5 to -1.5 dB",c:"cut"},{f:"60–80 Hz",t:"Boost",a:"Low-end cohesion & weight",v:"+0.5 to +1 dB",c:"boost"},{f:"10–16 kHz",t:"Shelf",a:"Overall air & openness",v:"+0.5 to +1.5 dB",c:"boost"}],tip:"Mix bus EQ should be micro-adjustments only. If you're moving more than 1–2 dB on a bus, fix it on the channel."}
+};
+
+const COMP={
+"Lead Vocal (M)":{ratio:"2:1–4:1",attack:"5–15 ms",release:"60–120 ms",thresh:"-24 to -18 dB",gr:"3–6 dB",note:"Gain ride into the compressor first. Two compressors in series: one fast for peaks, one slow for tone shaping."},
+"Lead Vocal (F)":{ratio:"2:1–3:1",attack:"5–10 ms",release:"50–100 ms",thresh:"-22 to -16 dB",gr:"3–5 dB",note:"Optical-style compressors (LA-2A) sound very natural. Female vocals often need less ratio than male."},
+"BG Vocals":{ratio:"3:1–5:1",attack:"5–15 ms",release:"60–100 ms",thresh:"-28 to -20 dB",gr:"4–6 dB",note:"Can compress more aggressively than lead. Parallel comp works well for density in the stack."},
+"Vocal Doubles":{ratio:"4:1–6:1",attack:"3–10 ms",release:"50–80 ms",thresh:"-28 to -20 dB",gr:"5–8 dB",note:"Doubles can be compressed hard to even out level before blending wide. Consistent level = seamless width."},
+"Vocal Bus":{ratio:"2:1–3:1",attack:"10–20 ms",release:"100–200 ms",thresh:"-18 to -12 dB",gr:"2–4 dB",note:"Bus compression glues the vocal stack. Slow attack preserves lead transients. Keep GR light."},
+"Kick":{ratio:"4:1–6:1",attack:"5–15 ms",release:"50–100 ms",thresh:"-18 to -12 dB",gr:"4–8 dB",note:"Slow attack lets the transient punch through first. Fast release restores body. Parallel compression adds punch."},
+"Snare":{ratio:"4:1–8:1",attack:"3–10 ms",release:"40–80 ms",thresh:"-20 to -14 dB",gr:"4–8 dB",note:"Two compressors in series: one fast (transient control), one slower (tone/glue). Gate bottom snare mic first."},
+"Closed Hat":{ratio:"2:1–3:1",attack:"1–5 ms",release:"30–60 ms",thresh:"-24 to -18 dB",gr:"2–4 dB",note:"Hats don't always need compression. If used, keep it transparent. Fast-attack limiter tames harsh transients."},
+"Open Hat":{ratio:"2:1–3:1",attack:"5–15 ms",release:"80–150 ms",thresh:"-22 to -16 dB",gr:"2–4 dB",note:"Slow attack preserves the natural wash and swell. Avoid killing the decay — that's what makes it feel alive."},
+"Percussion":{ratio:"3:1–5:1",attack:"2–8 ms",release:"50–100 ms",thresh:"-22 to -16 dB",gr:"3–6 dB",note:"Fast attack and release for snappy perc. Transient shapers can be better than traditional comp here."},
+"Drum Bus":{ratio:"2:1–4:1",attack:"10–30 ms",release:"100–300 ms",thresh:"-18 to -10 dB",gr:"2–4 dB",note:"Slow attack on the bus preserves kit transients while the tails get glued. SSL G-Bus style is the classic."},
+"Electric Bass":{ratio:"3:1–6:1",attack:"10–30 ms",release:"100–200 ms",thresh:"-20 to -12 dB",gr:"3–6 dB",note:"Optical compression sounds natural on bass. Slower attack keeps the note attack present. Sidechain to kick."},
+"Synth Bass":{ratio:"4:1–6:1",attack:"5–20 ms",release:"80–150 ms",thresh:"-20 to -14 dB",gr:"4–8 dB",note:"Multi-band comp — compress the sub region (20–80 Hz) separately for tight low end. Sidechain to kick."},
+"Sub Bass":{ratio:"4:1–8:1",attack:"5–10 ms",release:"80–120 ms",thresh:"-20 to -14 dB",gr:"4–8 dB",note:"Keep sub bass tightly controlled — peaks in the sub eat headroom invisibly. A limiter catches rogue peaks."},
+"Bass Bus":{ratio:"2:1–3:1",attack:"15–30 ms",release:"100–200 ms",thresh:"-16 to -10 dB",gr:"2–4 dB",note:"Bus comp glues electric, synth and sub together. Sidechain the whole bass bus from the kick."},
+"Clean Guitar":{ratio:"2:1–4:1",attack:"10–20 ms",release:"100–200 ms",thresh:"-22 to -16 dB",gr:"2–4 dB",note:"Light comp preserves the natural pick attack. Optical compressor adds warmth and sustain for chords."},
+"Distorted Guitar":{ratio:"3:1–6:1",attack:"3–10 ms",release:"50–100 ms",thresh:"-24 to -18 dB",gr:"3–6 dB",note:"Distorted guitars are already amplitude-limited by the amp. Light compression for level control."},
+"Acoustic Guitar":{ratio:"2:1–4:1",attack:"10–30 ms",release:"100–200 ms",thresh:"-24 to -18 dB",gr:"2–4 dB",note:"Preserve natural dynamics and warmth. Slow attack keeps pick attack. Optical comp feels most natural."},
+"Plucked":{ratio:"3:1–5:1",attack:"2–8 ms",release:"50–100 ms",thresh:"-22 to -16 dB",gr:"3–5 dB",note:"Fast attack tames pluck transient. Release should match note rhythm. Parallel blend for added sustain."},
+"Guitar Bus":{ratio:"2:1–3:1",attack:"15–30 ms",release:"100–250 ms",thresh:"-16 to -10 dB",gr:"2–3 dB",note:"Slow attack preserves pick attacks across all guitars while sustain gets glued. Keep GR under 3 dB."},
+"Bright Pop Piano":{ratio:"2:1–4:1",attack:"5–15 ms",release:"80–150 ms",thresh:"-22 to -16 dB",gr:"3–5 dB",note:"Fast attack controls hard hits. Medium release lets the note tail breathe. Parallel adds density to chords."},
+"Warm Ballad Piano":{ratio:"1.5:1–3:1",attack:"20–50 ms",release:"150–300 ms",thresh:"-24 to -18 dB",gr:"2–4 dB",note:"Very gentle compression — preserve the natural performance feel. Slow attack/release keeps piano human."},
+"Pluck Synth":{ratio:"3:1–6:1",attack:"2–8 ms",release:"50–100 ms",thresh:"-22 to -16 dB",gr:"3–6 dB",note:"Fast attack tightens the pluck. Short release keeps it snappy and rhythmic."},
+"Pad":{ratio:"2:1–3:1",attack:"30–80 ms",release:"200–500 ms",thresh:"-24 to -16 dB",gr:"1–3 dB",note:"Very slow attack and release — pads are ambient texture. Compression here is for level consistency."},
+"Lead Synth":{ratio:"3:1–5:1",attack:"5–15 ms",release:"80–150 ms",thresh:"-22 to -16 dB",gr:"3–5 dB",note:"Sidechain compress the lead synth from the lead vocal so it ducks slightly — keeps the mix clear."},
+"Arp Synth":{ratio:"3:1–5:1",attack:"2–8 ms",release:"40–80 ms",thresh:"-24 to -18 dB",gr:"3–5 dB",note:"Tight fast comp keeps arp notes even in level. Release should match note rhythm to avoid pumping."},
+"Organ":{ratio:"2:1–4:1",attack:"10–20 ms",release:"100–200 ms",thresh:"-22 to -16 dB",gr:"2–4 dB",note:"Organs sustain continuously so compression is for level shaping, not transient control. Light touch."},
+"Pop Strings":{ratio:"2:1–4:1",attack:"20–50 ms",release:"150–300 ms",thresh:"-24 to -18 dB",gr:"2–4 dB",note:"Preserve natural bow attack and string swell. Slow attack and release. Bus comp adds cohesion."},
+"Keys & Synth Bus":{ratio:"2:1–3:1",attack:"20–40 ms",release:"150–300 ms",thresh:"-18 to -12 dB",gr:"2–3 dB",note:"Bus comp knits pads, leads, arps and keys together. Slow attack preserves transients. Keep GR under 3 dB."},
+"Mix Bus":{ratio:"1.5:1–2:1",attack:"20–50 ms",release:"200–500 ms",thresh:"-3 to -1 dB GR target",gr:"1–2 dB",note:"Mix bus compression is for glue, not level control. SSL G-Bus or VCA style. Engage before balancing levels."}
+};
+
+const FX={
+"Lead Vocal (M)":{col:"#f064a8",chain:["Input","Gate","HPF","EQ","De-esser","Comp 1","Comp 2","Sat","Reverb","Delay","Output"],plugins:[
+  {name:"Waves NS1 Noise Suppressor",badge:"waves",rows:[{l:"Sensitivity",v:"Start at 50, adjust until breath noise tamed between words"},{l:"Use",v:"Always on, first in chain — cleans signal before processing"}]},
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"80 Hz, 24 dB/oct, Butterworth"},{l:"Bell cut",v:"250 Hz, Q 2.0, -3 dB — box removal"},{l:"Bell cut",v:"800 Hz, Q 1.5, -2 dB — nasal honk"},{l:"Bell boost",v:"3.5 kHz, Q 1.2, +3 dB — presence"},{l:"High shelf",v:"12 kHz, +2 dB — air"}]},
+  {name:"Waves Renaissance DeEsser",badge:"waves",rows:[{l:"Freq",v:"7.5 kHz"},{l:"Threshold",v:"Auto — set so only s/sh sounds trigger"},{l:"Mode",v:"Split band (preserves body of vocal)"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Peak Reduction",v:"Set for 4–6 dB GR on loud syllables"},{l:"Gain",v:"Make-up gain to match input level"},{l:"Mode",v:"Compress (not limit) — optical, musical response"},{l:"Use",v:"Comp 2 — tone/glue. Pair after a fast VCA first"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"5 (fastest on CLA-76 scale)"},{l:"Release",v:"Auto (7)"},{l:"Input/Output",v:"Set for 3–4 dB GR peak control"},{l:"Use",v:"Comp 1 — fast transient clamping"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Speed",v:"15 ips"},{l:"Bias",v:"Normal"},{l:"Input",v:"+2 to +4 dB into tape for warmth"},{l:"Use",v:"Tape saturation — adds harmonic richness"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Recording Studio"},{l:"Decay",v:"0.8s"},{l:"Brightness",v:"-1 to 0"},{l:"Character",v:"0 (natural)"},{l:"Pre-delay",v:"18 ms"},{l:"Use",v:"Short room reverb for depth"}]}
+]},
+"Lead Vocal (F)":{col:"#f064a8",chain:["Input","HPF","EQ","De-esser","Comp","Harmonic Sat","Reverb","Delay","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"100 Hz, 24 dB/oct"},{l:"Bell cut",v:"200 Hz, Q 1.8, -2 dB — remove box"},{l:"Bell boost",v:"3.5 kHz, Q 1.0, +2 dB — presence"},{l:"High shelf",v:"14 kHz, +3 dB — air / brilliance"}]},
+  {name:"Waves Renaissance DeEsser",badge:"waves",rows:[{l:"Freq",v:"8.5 kHz — female sibilance sits higher"},{l:"Threshold",v:"Set dynamically — avoid over-compression"},{l:"Mode",v:"Broadband for harsh S, split band for transparency"}]},
+  {name:"UAD Teletronix LA-2A Silver",badge:"uad",rows:[{l:"Peak Reduction",v:"3–5 dB GR — gentle optical compression"},{l:"Mode",v:"Compress"},{l:"Character",v:"Silver = slightly brighter than Classic, suits female vox"}]},
+  {name:"Waves J37 Tape",badge:"waves",rows:[{l:"Speed",v:"15 ips"},{l:"Saturation",v:"2–3%"},{l:"Wow/Flutter",v:"Minimal — 0.1"},{l:"Use",v:"Warmth and second-harmonic shimmer on female vox"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Scoring Stage"},{l:"Decay",v:"1.2s"},{l:"Brightness",v:"+1 — brighter reverb for female vox"},{l:"Pre-delay",v:"22 ms — pushes vocal forward in space"}]}
+]},
+"BG Vocals":{col:"#f064a8",chain:["Input","HPF","EQ","Comp","Sat","Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"130 Hz, aggressive 24 dB/oct"},{l:"Bell cut",v:"2.5 kHz, Q 1.5, -3 dB — sit behind lead"},{l:"High shelf",v:"10 kHz, +2 dB — blend into stereo field"}]},
+  {name:"Waves CLA-2A",badge:"waves",rows:[{l:"Peak Reduction",v:"Set for 5–7 dB GR — can be aggressive on BGs"},{l:"Gain",v:"Make-up gain to taste"},{l:"Mode",v:"Compress"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Large Hall"},{l:"Decay",v:"2.0s"},{l:"Mix",v:"40% wet — push BGs deep into the space"},{l:"Pre-delay",v:"30 ms"}]}
+]},
+"Vocal Doubles":{col:"#f064a8",chain:["Input","HPF","EQ","Hard Comp","Width","Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"160 Hz, 24 dB/oct — remove all body"},{l:"Bell cut",v:"500 Hz, Q 2.0, -5 dB — thin it out"},{l:"High shelf",v:"10 kHz, +3 dB — shimmer only"}]},
+  {name:"Waves CLA-76 Bluey",badge:"waves",rows:[{l:"Ratio",v:"All-buttons-in (Nuke) or 8:1"},{l:"Attack",v:"3–5"},{l:"Release",v:"7 (Auto)"},{l:"Use",v:"Hard compression to even level — doubles need consistency"}]},
+  {name:"Waves S1 Stereo Imager",badge:"waves",rows:[{l:"Width",v:"1.3–1.5 — widen doubles left and right"},{l:"Pan",v:"Hard pan track L40 / duplicate R40"}]}
+]},
+"Vocal Bus":{col:"#f064a8",chain:["All Vox","Bus EQ","Glue Comp","Sat","Reverb","Limiter","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"80 Hz, 12 dB/oct"},{l:"High shelf",v:"12 kHz, +1.5 dB — collective air"},{l:"Bell trim",v:"250 Hz, Q 1.0, -1 dB — collective mud"}]},
+  {name:"UAD SSL G Bus Compressor",badge:"uad",rows:[{l:"Ratio",v:"2:1"},{l:"Attack",v:"30 ms"},{l:"Release",v:"Auto"},{l:"Threshold",v:"Set for 2–3 dB GR consistently"},{l:"Make-up",v:"+2 dB"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Input",v:"+2 dB — light tape glue across vocal stack"},{l:"Speed",v:"15 ips"}]},
+  {name:"Waves L2 Ultramaximizer",badge:"waves",rows:[{l:"Threshold",v:"-1 dBTP"},{l:"Out Ceiling",v:"-0.3 dBTP"},{l:"Release",v:"Auto — catch rogue peaks only"}]}
+]},
+"Kick":{col:"#c8f064",chain:["Input","Gate","EQ","Comp","Transient","Parallel","Limiter","Output"],plugins:[
+  {name:"Waves NS1",badge:"waves",rows:[{l:"Use",v:"Gating — clean up bleed between kick hits"}]},
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"30 Hz, 12 dB/oct"},{l:"Bell boost",v:"55 Hz, Q 1.5, +4 dB — sub weight"},{l:"Bell cut",v:"300 Hz, Q 2.0, -5 dB — cardboard tone"},{l:"Bell boost",v:"3 kHz, Q 1.2, +3 dB — beater click"},{l:"Bell boost",v:"9 kHz, Q 1.0, +2 dB — snap"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"5 (medium — let transient through)"},{l:"Release",v:"5"},{l:"GR",v:"4–6 dB"}]},
+  {name:"Waves Smack Attack",badge:"waves",rows:[{l:"Attack",v:"+20% — enhance beater click"},{l:"Sustain",v:"-10% — tighten tail"},{l:"Sensitivity",v:"Set so only the transient triggers"}]},
+  {name:"UAD Neve 33609",badge:"uad",rows:[{l:"Use",v:"Parallel compression bus — compress hard into this"},{l:"Ratio",v:"10:1, fast attack, slow release"},{l:"Blend",v:"25–30% wet into main kick signal"}]}
+]},
+"Snare":{col:"#c8f064",chain:["Input","Gate","EQ","Comp 1","Comp 2","Sat","Output"],plugins:[
+  {name:"Waves NS1",badge:"waves",rows:[{l:"Use",v:"Noise gate — remove hi-hat bleed between snare hits"}]},
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"Bell boost",v:"130 Hz, Q 1.5, +3 dB — body"},{l:"Bell cut (sweep)",v:"350 Hz, Q 3.0, -5 dB — find & kill ring"},{l:"Bell boost",v:"3 kHz, Q 1.2, +4 dB — crack/attack"},{l:"Bell boost",v:"11 kHz, Q 1.0, +2 dB — sizzle"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"8:1"},{l:"Attack",v:"3 — fast transient clamp"},{l:"Release",v:"5"},{l:"GR",v:"5–7 dB"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Use",v:"Second compressor — slower, tonal glue"},{l:"Peak Reduction",v:"3–4 dB GR"},{l:"Mode",v:"Compress"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Input",v:"+4 dB — tape saturation for body warmth"},{l:"Speed",v:"15 ips"}]}
+]},
+"Closed Hat":{col:"#c8f064",chain:["Input","HPF","EQ","Light Comp","Width","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"200 Hz, 18 dB/oct — remove bleed"},{l:"Bell cut",v:"450 Hz, Q 2.0, -4 dB — clang removal"},{l:"High shelf",v:"10 kHz, +2 dB — crisp tsss"}]},
+  {name:"Waves CLA-2A",badge:"waves",rows:[{l:"Peak Reduction",v:"Very low — 1–2 dB GR only, transparent"},{l:"Mode",v:"Compress"}]}
+]},
+"Open Hat":{col:"#c8f064",chain:["Input","Gate","HPF","EQ","Comp","Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"250 Hz, aggressive 24 dB/oct"},{l:"Bell cut",v:"650 Hz, Q 2.0, -4 dB — harsh clang"},{l:"Bell boost",v:"9 kHz, Q 1.0, +2 dB — cymbal wash"}]},
+  {name:"Waves CLA-2A",badge:"waves",rows:[{l:"Peak Reduction",v:"2–3 dB GR — slow optical response preserves swell"},{l:"Mode",v:"Compress"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Small Room"},{l:"Decay",v:"0.4s"},{l:"Mix",v:"15% wet — subtle space only"}]}
+]},
+"Percussion":{col:"#c8f064",chain:["Input","HPF","EQ","Comp","Width","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"120 Hz"},{l:"Bell cut",v:"500 Hz, Q 1.5, -3 dB — woody body"},{l:"Bell boost",v:"3 kHz, Q 1.2, +2 dB — snap attack"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"3 (fast)"},{l:"Release",v:"3–5"},{l:"GR",v:"3–5 dB"}]},
+  {name:"Waves S1 Stereo Imager",badge:"waves",rows:[{l:"Width",v:"1.2"},{l:"Pan",v:"Hard pan congas L/R, shakers wider"}]}
+]},
+"Drum Bus":{col:"#c8f064",chain:["All Drums","Bus EQ","Transient Shape","Bus Comp","Tape Sat","Parallel","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"30 Hz, 12 dB/oct"},{l:"Bell cut",v:"250 Hz, Q 1.0, -1.5 dB — shared boxiness"},{l:"Low shelf",v:"60 Hz, +1.5 dB — kit sub glue"},{l:"High shelf",v:"10 kHz, +1 dB — overhead air"}]},
+  {name:"Waves Smack Attack",badge:"waves",rows:[{l:"Attack",v:"+20% — preserve kit punch"},{l:"Sustain",v:"-10% — tighten tails"}]},
+  {name:"UAD SSL G Bus Compressor",badge:"uad",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"30 ms"},{l:"Release",v:"Auto"},{l:"Threshold",v:"2–3 dB GR"},{l:"Make-up",v:"+2 dB"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Input",v:"+2 dB — bus tape warmth"},{l:"Speed",v:"15 ips"}]},
+  {name:"UAD Neve 33609",badge:"uad",rows:[{l:"Use",v:"Parallel crush bus — hard compress & blend 25–30%"},{l:"Ratio",v:"Limit mode, fast attack"}]}
+]},
+"Electric Bass":{col:"#64d4f0",chain:["DI + Amp","EQ","Comp","Saturation","Parallel","Sidechain","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"35 Hz, 12 dB/oct"},{l:"Bell cut",v:"200 Hz, Q 1.5, -4 dB — mud"},{l:"Bell boost",v:"850 Hz, Q 1.0, +2 dB — growl"},{l:"Bell boost",v:"3.5 kHz, Q 1.2, +1.5 dB — string definition"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Peak Reduction",v:"4–6 dB GR"},{l:"Mode",v:"Compress"},{l:"Gain",v:"Match output level"},{l:"Use",v:"Optical — natural bass leveling"}]},
+  {name:"Waves J37 Tape",badge:"waves",rows:[{l:"Speed",v:"7.5 ips — slower speed = more saturation"},{l:"Saturation",v:"3–5% — harmonics for small speaker translation"},{l:"Wow/Flutter",v:"Minimal"}]},
+  {name:"Waves C6 Multiband Comp",badge:"waves",rows:[{l:"Band 1",v:"20–80 Hz — compress sub region separately"},{l:"Band 1 Ratio",v:"4:1, fast attack"},{l:"Band 2",v:"Bypass — leave mid character alone"}]},
+  {name:"Waves MV2",badge:"waves",rows:[{l:"Use",v:"Sidechain trigger — set as key input from kick"},{l:"Low Vol Boost",v:"Off — just use as sidechain source"}]}
+]},
+"Synth Bass":{col:"#64d4f0",chain:["Synth Out","HPF","EQ","Distortion","Multi-band Comp","Sidechain","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"25 Hz, 12 dB/oct"},{l:"Bell boost",v:"55 Hz, Q 1.5, +3 dB — sub presence"},{l:"Bell cut",v:"250 Hz, Q 1.5, -4 dB — mud"},{l:"Bell boost",v:"1.5 kHz, Q 1.0, +2 dB — character"}]},
+  {name:"Waves Greg Wells ToneCentric",badge:"waves",rows:[{l:"Character",v:"0.3 — gentle saturation with harmonics"},{l:"Use",v:"Adds upper harmonics so synth bass translates on earbuds"}]},
+  {name:"Waves C6 Multiband Comp",badge:"waves",rows:[{l:"Band 1 (sub)",v:"20–80 Hz, Ratio 6:1, fast attack — tighten sub"},{l:"Band 2 (mid)",v:"80–300 Hz, Ratio 2:1 — gentle control"},{l:"Bands 3-6",v:"Bypass — preserve synth character"}]}
+]},
+"Sub Bass":{col:"#64d4f0",chain:["Out","HPF","EQ","Saturation","LPF","Mono","Sidechain","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"22 Hz, 24 dB/oct — remove infrasonic"},{l:"Bell boost",v:"50 Hz, Q 2.0, +4 dB — core sub weight"},{l:"Bell cut",v:"100 Hz, Q 1.5, -3 dB — mid-bass bloom"},{l:"LPF",v:"200 Hz, 12 dB/oct — keep pure sub"},{l:"Mid/Side mode",v:"Cut all Side content below 200 Hz — force to mono"}]},
+  {name:"Waves Greg Wells ToneCentric",badge:"waves",rows:[{l:"Character",v:"0.5 — add harmonics for earbud translation"},{l:"Use",v:"Essential for sub — without harmonics, sub disappears on small speakers"}]},
+  {name:"Waves L2 Ultramaximizer",badge:"waves",rows:[{l:"Threshold",v:"-2 dBTP"},{l:"Use",v:"Catch rogue sub peaks — prevents clip on output"}]}
+]},
+"Bass Bus":{col:"#64d4f0",chain:["All Bass","Bus EQ","Comp","Mono Check","Sidechain","Limiter","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"Mid/Side",v:"Cut all Side below 80 Hz — mono bass is critical"},{l:"Bell cut",v:"175 Hz, Q 1.0, -2 dB — collective mud"},{l:"Bell boost",v:"60 Hz, Q 2.0, +1.5 dB — sub cohesion"}]},
+  {name:"UAD SSL G Bus Compressor",badge:"uad",rows:[{l:"Ratio",v:"3:1"},{l:"Attack",v:"30 ms"},{l:"Release",v:"Auto"},{l:"Threshold",v:"2–4 dB GR"}]},
+  {name:"UAD Neve 33609",badge:"uad",rows:[{l:"Use",v:"Sidechain-triggered via kick — whole bass bus ducks"},{l:"GR",v:"2–3 dB on kick hits, fast release"}]}
+]},
+"Clean Guitar":{col:"#c8f064",chain:["Input","Gate","EQ","Comp","Chorus","Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"85 Hz, 18 dB/oct"},{l:"Bell cut",v:"400 Hz, Q 1.5, -4 dB — boxiness"},{l:"Bell boost",v:"1.5 kHz, Q 1.0, +2 dB — string definition"},{l:"High shelf",v:"8 kHz, +1.5 dB — sparkle"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Peak Reduction",v:"3–4 dB GR"},{l:"Mode",v:"Compress"},{l:"Use",v:"Optical — adds warmth and natural sustain to clean guitar"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Small Recording Studio"},{l:"Decay",v:"0.6s"},{l:"Mix",v:"20% wet — place guitar in room without swimming"}]}
+]},
+"Distorted Guitar":{col:"#c8f064",chain:["Amp Sim","Noise Gate","EQ","Light Comp","IR Cab","Delay","Output"],plugins:[
+  {name:"Waves NS1",badge:"waves",rows:[{l:"Use",v:"Noise gate — tight between palm mutes and riffs"},{l:"Sensitivity",v:"65 — aggressive, no buzz bleed"}]},
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"100 Hz, 24 dB/oct — remove low-end thud"},{l:"Bell cut",v:"400 Hz, Q 2.0, -5 dB — fizzy box"},{l:"Bell boost",v:"3 kHz, Q 1.0, +2 dB — aggression"},{l:"Bell cut",v:"8 kHz, Q 1.5, -2 dB — harsh fizz"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"5"},{l:"Release",v:"5"},{l:"GR",v:"3–4 dB — level consistency only"}]}
+]},
+"Acoustic Guitar":{col:"#c8f064",chain:["Mic(s)","HPF","EQ","Comp","Tape Sat","Room Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"80 Hz, 18 dB/oct"},{l:"Bell cut",v:"250 Hz, Q 1.5, -3 dB — body box"},{l:"Bell boost",v:"1.5 kHz, Q 1.0, +1.5 dB — pick attack"},{l:"High shelf",v:"10 kHz, +2 dB — string shimmer"}]},
+  {name:"UAD Teletronix LA-2A Silver",badge:"uad",rows:[{l:"Peak Reduction",v:"3–4 dB GR"},{l:"Mode",v:"Compress"},{l:"Use",v:"Silver is slightly brighter — ideal for acoustic"}]},
+  {name:"Waves J37 Tape",badge:"waves",rows:[{l:"Speed",v:"15 ips"},{l:"Saturation",v:"2% — subtle warmth on acoustic"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Small Room"},{l:"Decay",v:"0.8s"},{l:"Mix",v:"20% wet"}]}
+]},
+"Plucked":{col:"#c8f064",chain:["Input","HPF","EQ","Comp","Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"100 Hz, 18 dB/oct"},{l:"Bell cut",v:"250 Hz, Q 1.5, -3 dB — muddy body"},{l:"Bell boost",v:"2.5 kHz, Q 1.2, +2 dB — pluck transient"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"3 — fast, tames velocity differences"},{l:"Release",v:"5"},{l:"GR",v:"4–5 dB"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Chamber"},{l:"Decay",v:"1.2s"},{l:"Mix",v:"25% wet"}]}
+]},
+"Guitar Bus":{col:"#c8f064",chain:["All Guitars","Bus EQ","Glue Comp","Width","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"80 Hz, 12 dB/oct"},{l:"Bell cut",v:"400 Hz, Q 1.0, -2 dB — collective box"},{l:"High shelf",v:"10 kHz, +1.5 dB — collective air"}]},
+  {name:"UAD SSL G Bus Compressor",badge:"uad",rows:[{l:"Ratio",v:"2:1"},{l:"Attack",v:"30 ms"},{l:"Release",v:"Auto"},{l:"Threshold",v:"2–3 dB GR"},{l:"Use",v:"Glues rhythm and lead guitars into one sound"}]}
+]},
+"Bright Pop Piano":{col:"#a064f0",chain:["Input","HPF","EQ","Comp","Harmonic Exc","Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"65 Hz, 18 dB/oct"},{l:"Bell cut",v:"280 Hz, Q 1.5, -2.5 dB — mud"},{l:"Bell boost",v:"1.5 kHz, Q 1.0, +1.5 dB — hammer attack"},{l:"High shelf",v:"10 kHz, +3 dB — bright sparkle"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"5"},{l:"Release",v:"5"},{l:"GR",v:"3–4 dB"},{l:"Use",v:"Fast attack tames aggressive chord hits"}]},
+  {name:"Waves Vitamin Sonic Enhancer",badge:"waves",rows:[{l:"Sub",v:"0"},{l:"Low",v:"0"},{l:"Mid",v:"0"},{l:"High",v:"+2 — high-end harmonic excitation"},{l:"Presence",v:"+1"},{l:"Width",v:"10%"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Bright Room"},{l:"Decay",v:"1.5s"},{l:"Mix",v:"20% wet"}]}
+]},
+"Warm Ballad Piano":{col:"#a064f0",chain:["Input","HPF","EQ","Comp","Tape Sat","Hall Reverb","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"40 Hz, gentle 6 dB/oct"},{l:"Bell boost",v:"120 Hz, Q 1.5, +2 dB — warmth"},{l:"Bell cut",v:"500 Hz, Q 1.5, -2.5 dB — honk"},{l:"Bell boost",v:"5 kHz, Q 1.0, +1.5 dB — note definition"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Peak Reduction",v:"3–4 dB GR — very gentle"},{l:"Mode",v:"Compress"},{l:"Use",v:"Optical is perfect here — preserves natural piano dynamics"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Speed",v:"7.5 ips — slower for more warmth and saturation"},{l:"Input",v:"+4 dB"},{l:"Bias",v:"Overbias (+1) for extra warmth"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Large Hall"},{l:"Decay",v:"3.0s"},{l:"Brightness",v:"-1 — darker reverb for ballad warmth"},{l:"Mix",v:"30% wet"}]}
+]},
+"Pluck Synth":{col:"#a064f0",chain:["Synth Out","HPF","EQ","Comp","LPF Automation","Stereo","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"100 Hz, 18 dB/oct"},{l:"Bell cut",v:"300 Hz, Q 1.5, -3 dB — mud"},{l:"Bell boost",v:"2.5 kHz, Q 1.2, +2 dB — pluck"},{l:"LPF (automate)",v:"Start at 2 kHz, sweep to 16 kHz on builds"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"3"},{l:"Release",v:"5"},{l:"GR",v:"4–5 dB — tighten velocity"}]}
+]},
+"Pad":{col:"#a064f0",chain:["Synth Out","HPF","EQ","Slow Comp","Chorus","Hall Reverb","Width","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"150 Hz, 24 dB/oct — hard roll-off"},{l:"Bell cut",v:"3 kHz, Q 1.2, -2 dB — stay out of vocal zone"},{l:"High shelf",v:"10 kHz, +2 dB — shimmer"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Peak Reduction",v:"1–2 dB GR — level consistency only"},{l:"Mode",v:"Compress"},{l:"Use",v:"Very gentle — preserve pad swell dynamics"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Scoring Stage"},{l:"Decay",v:"5.0s"},{l:"Mix",v:"45% wet — ambient wash"},{l:"Pre-delay",v:"0 ms — pads should bloom immediately"}]},
+  {name:"Waves S1 Stereo Imager",badge:"waves",rows:[{l:"Width",v:"1.6 — push wide into stereo field"},{l:"Use",v:"Cut mono content below 200 Hz before widening"}]}
+]},
+"Lead Synth":{col:"#a064f0",chain:["Synth Out","HPF","EQ","Comp","Distortion","Delay","Sidechain","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"80 Hz, 18 dB/oct"},{l:"Bell cut",v:"300 Hz, Q 1.5, -2 dB — mid clean-up"},{l:"Bell boost",v:"3 kHz, Q 1.2, +3 dB — synth lead presence"},{l:"High shelf",v:"10 kHz, +2 dB — brightness"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"5"},{l:"Release",v:"5"},{l:"GR",v:"3–5 dB — even out the synth sustain"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Input",v:"+3 dB — tape sat adds grit and character to lead synth"},{l:"Speed",v:"15 ips"}]},
+  {name:"Waves H-Delay",badge:"waves",rows:[{l:"Time",v:"Dotted 1/8 — sync to tempo"},{l:"Feedback",v:"20–25%"},{l:"Mix",v:"20% wet"},{l:"Filter",v:"HP 200 Hz / LP 8 kHz on delay taps"}]}
+]},
+"Arp Synth":{col:"#a064f0",chain:["Synth Out","HPF","EQ","Tight Comp","Reverb","Wide Pan","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"100 Hz, 18 dB/oct"},{l:"Bell cut",v:"400 Hz, Q 1.5, -3 dB"},{l:"High shelf",v:"12 kHz, +2 dB — silky shimmer"}]},
+  {name:"Waves CLA-76 Blacky",badge:"waves",rows:[{l:"Ratio",v:"4:1"},{l:"Attack",v:"3 — fast, keep arp notes even"},{l:"Release",v:"3 — match release to note rhythm"},{l:"GR",v:"4–6 dB"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Small Room"},{l:"Decay",v:"1.0s"},{l:"Mix",v:"20% wet — keep it rhythmically tight"},{l:"Pre-delay",v:"15 ms"}]},
+  {name:"Waves S1 Stereo Imager",badge:"waves",rows:[{l:"Width",v:"1.4"},{l:"Pan",v:"L50/R50 — arp should be wide and airy"}]}
+]},
+"Organ":{col:"#a064f0",chain:["Input","Leslie Sim","HPF","EQ","Overdrive","Comp","Output"],plugins:[
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Input",v:"+5 dB — organs love tape overdrive"},{l:"Speed",v:"7.5 ips — maximum warmth"},{l:"Bias",v:"Overbias +2 — full harmonic saturation"}]},
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"50 Hz, 12 dB/oct — cut pedal note sub"},{l:"Bell cut",v:"250 Hz, Q 1.5, -3 dB — box/honk"},{l:"Bell boost",v:"1 kHz, Q 1.0, +2 dB — key click and drawbar presence"}]},
+  {name:"Waves CLA-2A",badge:"waves",rows:[{l:"Peak Reduction",v:"3–4 dB GR — gentle on swell"},{l:"Mode",v:"Compress"},{l:"Use",v:"Level shaping — optical preserves organ dynamic expression"}]}
+]},
+"Pop Strings":{col:"#a064f0",chain:["Input","HPF","EQ","Comp","Reverb","Width","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"80 Hz, 18 dB/oct"},{l:"Bell cut",v:"300 Hz, Q 1.5, -2.5 dB — body box"},{l:"Bell boost",v:"1.5 kHz, Q 1.0, +1.5 dB — bow articulation"},{l:"High shelf",v:"10 kHz, +3 dB — silky string sheen"}]},
+  {name:"UAD Teletronix LA-2A Classic",badge:"uad",rows:[{l:"Peak Reduction",v:"3–4 dB GR"},{l:"Mode",v:"Compress"},{l:"Use",v:"Optical — preserves bow attack and swell dynamics"}]},
+  {name:"FabFilter Pro-R",badge:"fab",rows:[{l:"Space",v:"Scoring Stage"},{l:"Decay",v:"2.5s"},{l:"Mix",v:"35% wet"},{l:"Pre-delay",v:"25 ms"}]},
+  {name:"Waves S1 Stereo Imager",badge:"waves",rows:[{l:"Width",v:"1.3 — natural orchestral spread"}]}
+]},
+"Keys & Synth Bus":{col:"#a064f0",chain:["All Keys","Bus EQ","Glue Comp","Tape Sat","Width","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"60 Hz, 12 dB/oct"},{l:"Bell cut",v:"250 Hz, Q 1.0, -1.5 dB — collective mud"},{l:"High shelf",v:"12 kHz, +1.5 dB — collective air"}]},
+  {name:"UAD SSL G Bus Compressor",badge:"uad",rows:[{l:"Ratio",v:"2:1"},{l:"Attack",v:"30 ms"},{l:"Release",v:"Auto"},{l:"Threshold",v:"Set for 2 dB GR consistently"},{l:"Use",v:"Gentle glue — knits all keys and synths together"}]},
+  {name:"UAD Studer A800",badge:"uad",rows:[{l:"Input",v:"+2 dB — warmth across the bus"},{l:"Speed",v:"15 ips"}]}
+]},
+"Mix Bus":{col:"#64d4f0",chain:["Full Mix","EQ","Bus Comp","Limiter","Output"],plugins:[
+  {name:"FabFilter Pro-Q 3",badge:"fab",rows:[{l:"HPF",v:"22 Hz, 6 dB/oct — gentle sub clean-up"},{l:"Bell cut",v:"200 Hz, Q 0.7, -1 dB — accumulated mud"},{l:"Low shelf",v:"65 Hz, +0.5 dB — weight and cohesion"},{l:"High shelf",v:"12 kHz, +1 dB — air and openness"},{l:"Note",v:"Every move should be under 1.5 dB — micro-adjustments only"}]},
+  {name:"UAD SSL G Bus Compressor",badge:"uad",rows:[{l:"Ratio",v:"2:1"},{l:"Attack",v:"30 ms"},{l:"Release",v:"Auto"},{l:"Threshold",v:"Target 1–2 dB GR consistently"},{l:"Make-up",v:"+1.5 dB"},{l:"Use",v:"Engage BEFORE balancing your mix — let it glue as you work"}]},
+  {name:"Waves L2 Ultramaximizer",badge:"waves",rows:[{l:"Threshold",v:"-1.5 dBTP"},{l:"Out Ceiling",v:"-0.3 dBTP"},{l:"Release",v:"Auto"},{l:"ARC",v:"On"},{l:"Use",v:"Final brick-wall limiter. For streaming: target -14 LUFS integrated"}]}
+]}
+};
+
+const GS_CATS={
+  channels:{label:"Channels"},
+  buses:{label:"Buses"},
+  master:{label:"Master"}
+};
+
+const GS={
+channels:{title:"Channel Gain Staging",tip:"The goal: every channel should hit the input of your first plugin at -18 dBFS RMS (equivalent to 0 VU on analog hardware). This gives maximum headroom before clipping and keeps plugins in their optimal operating range.",meters:[
+  {lbl:"Input level target",bar:55,col:"#c8f064",v:"-18 dBFS RMS",cls:"ok"},
+  {lbl:"Peak ceiling per channel",bar:75,col:"#c8f064",v:"-6 dBFS peak",cls:"ok"},
+  {lbl:"Danger zone — hot",bar:95,col:"#f064a8",v:"Above -3 dBFS",cls:"hot"},
+  {lbl:"Fader position ideal",bar:60,col:"#64d4f0",v:"Unity (0 dB) or close",cls:"ok"}
+],steps:[
+  "Clip gain / trim your audio BEFORE the fader. If a recorded vocal peaks at -6 dBFS, trim it down to hit -18 dBFS RMS before touching plugins.",
+  "Set your DAW channel fader to unity (0 dB) after gain staging. The fader is for mix balance, not for fixing levels.",
+  "Check your compressor's VU meter input. If the needle isn't moving around 0 VU, your gain staging is off.",
+  "After processing, each channel should output around -18 to -14 dBFS RMS into the bus.",
+  "Use Waves VU Meter or a similar RMS meter plugin on every channel while gain staging."
+]},
+buses:{title:"Bus / Stem Gain Staging",tip:"Each stem bus should sit 6–10 dB below the mix bus ceiling. This gives your mix bus compressor headroom to work properly and prevents the master from clipping.",meters:[
+  {lbl:"Vocal bus output",bar:50,col:"#f064a8",v:"-14 to -10 dBFS",cls:"ok"},
+  {lbl:"Drum bus output",bar:55,col:"#c8f064",v:"-12 to -8 dBFS",cls:"ok"},
+  {lbl:"Bass bus output",bar:50,col:"#64d4f0",v:"-14 to -10 dBFS",cls:"ok"},
+  {lbl:"Keys/Synth bus output",bar:45,col:"#a064f0",v:"-16 to -12 dBFS",cls:"ok"},
+  {lbl:"Mix bus input (summed)",bar:70,col:"#f0a064",v:"-10 to -6 dBFS",cls:"warn"}
+],steps:[
+  "Gain stage each individual bus after you've set channel levels. The bus fader should be at or near unity.",
+  "The mix bus receiving all stems should sum to around -10 to -6 dBFS RMS before hitting the mix bus compressor.",
+  "If your stems are hitting the mix bus too hot, pull down the master fader or reduce individual bus levels — not the mix bus fader.",
+  "Use FabFilter Pro-Q 3 in spectrum analyzer mode on your mix bus to check for frequency buildup before compression.",
+  "Check your mix at -6 dB playback volume. If elements disappear, your mix balance needs work — not more compression."
+]},
+master:{title:"Master / Mix Bus Levels",tip:"Your mix bus should never clip before hitting the limiter. The limiter is the final safety net, not the primary leveling tool. Aim for -3 to -6 dB of headroom before limiting.",meters:[
+  {lbl:"Mix bus input",bar:65,col:"#f0a064",v:"-10 to -6 dBFS RMS",cls:"warn"},
+  {lbl:"Mix bus comp output",bar:70,col:"#64d4f0",v:"-8 to -4 dBFS",cls:"ok"},
+  {lbl:"Limiter input",bar:75,col:"#f0a064",v:"-4 to -2 dBFS peak",cls:"warn"},
+  {lbl:"Limiter output ceiling",bar:82,col:"#c8f064",v:"-0.3 dBTP true peak",cls:"ok"},
+  {lbl:"Streaming target (LUFS)",bar:60,col:"#c8f064",v:"-14 LUFS integrated",cls:"ok"}
+],steps:[
+  "Set your limiter output ceiling to -0.3 dBTP (true peak) — not -0 dB. Streaming services add loudness normalization and true peaks can exceed 0 dBFS after encoding.",
+  "For Spotify/Apple Music: target -14 LUFS integrated. For YouTube: -14 LUFS. For Tidal (HiFi): -14 LUFS.",
+  "Use Waves WLM Plus or a loudness meter to measure integrated LUFS — not just peak levels.",
+  "Check your mix on multiple systems before limiting: studio monitors, headphones, laptop speakers, and phone speaker.",
+  "Your limiter should be catching peaks only — not constantly slamming. If GR is more than 3 dB, pull the mix faders down.",
+  "Bounce a test export at -3 dBTP headroom before final limiting and listen critically on earbuds."
+]}
+};
+
+const MIX_CATS={
+  prep:{label:"Pre-Mix"},
+  balance:{label:"Balance"},
+  space:{label:"Space"},
+  depth:{label:"Depth"},
+  final:{label:"Final Check"}
+};
+
+const MIX={
+prep:{title:"Pre-Mix Prep",col:"#f064a8",steps:[
+  {n:"01",t:"Gain stage all channels",d:"Every channel hits <span>-18 dBFS RMS</span> before first plugin. Use clip gain, not faders."},
+  {n:"02",t:"Set all faders to unity",d:"Reset everything to <span>0 dB</span>. The mix starts from unity."},
+  {n:"03",t:"Engage mix bus comp",d:"Put <span>UAD SSL G Bus</span> on from the start — 2:1, 30ms attack, auto release. Mix into it."},
+  {n:"04",t:"High-pass filter everything",d:"Every non-bass element gets an HPF. Vocals <span>80–100 Hz</span>, guitars <span>80 Hz</span>, synths <span>100–150 Hz</span>."},
+  {n:"05",t:"Mono check",d:"Make sure bass frequencies below <span>80 Hz</span> are mono. Check kick, bass, and sub in mono."},
+  {n:"06",t:"Label and colour code",d:"Colour all buses consistently — vocals pink, drums green, bass blue, keys purple."}
+]},
+balance:{title:"Mix Balance",col:"#c8f064",steps:[
+  {n:"01",t:"Start with drums and bass",d:"Get the low-end relationship right first. <span>Kick and bass</span> should lock together — sidechain if needed."},
+  {n:"02",t:"Bring in the lead vocal",d:"Set the <span>lead vocal</span> as your most important element. Everything else serves the vocal."},
+  {n:"03",t:"Add harmonic elements",d:"Bring in guitars, keys and synths to support the vocal. Keep <span>2–5 kHz</span> clear for vocal presence."},
+  {n:"04",t:"Check the low end in mono",d:"Collapse to mono and check that <span>kick, bass and sub</span> still punch through clearly."},
+  {n:"05",t:"Carve frequency spaces",d:"If two instruments fight, use <span>FabFilter Pro-Q 3</span> dynamic EQ — cut one where the other boosts."},
+  {n:"06",t:"Level pass at low volume",d:"Turn down to <span>-6 dB</span> from normal. Can you still hear everything? Fix what disappears."}
+]},
+space:{title:"Stereo Space & Panning",col:"#64d4f0",steps:[
+  {n:"01",t:"Keep the centre tight",d:"Lead vocal, kick, snare, bass and sub all sit in the <span>centre</span>. Never pan these elements."},
+  {n:"02",t:"Wide rhythm guitars",d:"Double-track and pan rhythm guitars <span>L60/R60</span> or harder. Creates a wall of sound."},
+  {n:"03",t:"BG vocals wide",d:"Stack and pan BG vocals at <span>L30/R30</span> to L50/R50 depending on the arrangement."},
+  {n:"04",t:"Synths and pads wide",d:"Pads should fill the <span>entire stereo field</span>. Use <span>Waves S1</span> to widen to 1.5–1.6."},
+  {n:"05",t:"Percussion hard panned",d:"Congas, shakers, tambourines: hard pan <span>L or R</span>. Creates interest and space."},
+  {n:"06",t:"Check for phase issues",d:"Use <span>FabFilter Pro-Q 3</span> in M/S mode and check correlation meter. Below -0.2 = phase problem."}
+]},
+depth:{title:"Depth & Dimension",col:"#a064f0",steps:[
+  {n:"01",t:"Reverb sends — not inserts",d:"Use reverb on <span>aux send channels</span> — never insert reverb directly on a track. Keeps it controllable."},
+  {n:"02",t:"Short room for drums",d:"Send drums to a <span>short room</span> reverb (0.4–0.8s). Glues the kit and adds dimension."},
+  {n:"03",t:"Plate for lead vocal",d:"Send lead vocal to a <span>plate reverb</span> (1.0–1.5s). Keep pre-delay at <span>20–25 ms</span>."},
+  {n:"04",t:"Large hall for pads",d:"Pads and strings go to a <span>large hall</span> (3–5s). This creates the 'bed' the mix sits on."},
+  {n:"05",t:"Pre-delay creates intimacy",d:"More pre-delay = vocal sounds further from the reverb. <span>20–30 ms</span> keeps it natural."},
+  {n:"06",t:"High-pass reverb returns",d:"HPF all reverb return channels at <span>200–300 Hz</span>. Reverb low-end muds up a mix quickly."},
+  {n:"07",t:"Delay before reverb",d:"Chain: dry vocal → <span>H-Delay</span> slap delay → then reverb send. Delay before reverb = more depth."}
+]},
+final:{title:"Final Checks Before Bounce",col:"#f0a064",steps:[
+  {n:"01",t:"A/B against a reference track",d:"Import a commercial reference at the <span>same LUFS level</span> as your mix. Switch between them."},
+  {n:"02",t:"Check in mono",d:"Collapse to mono. Does the <span>kick, bass and vocal</span> still sit correctly? Fix any phase cancellation."},
+  {n:"03",t:"Check on earbuds",d:"AirPods/earbuds reveal <span>harsh highs</span> and weak mids instantly. Your mix must translate here."},
+  {n:"04",t:"Check on laptop speaker",d:"Does the <span>low end</span> disappear? Does the vocal cut through? Fix the mid-range if not."},
+  {n:"05",t:"Limiter gain reduction check",d:"<span>Waves L2</span> should be catching less than 3 dB GR. More than that = mix is too loud before limiter."},
+  {n:"06",t:"True peak check",d:"Export at <span>-0.3 dBTP</span> true peak. Use a true peak meter, not just the peak meter in your DAW."},
+  {n:"07",t:"LUFS check",d:"Measure integrated LUFS with <span>Waves WLM Plus</span>. Target <span>-14 LUFS</span> for streaming."},
+  {n:"08",t:"Final blind listen",d:"Close your eyes, listen start to finish. Does it <span>feel good</span>? Trust your instincts — that's the final call."}
+]}
+};
+
+const SONGS_KEY='lmw_songs', IDEAS_KEY='lmw_ideas', MEMOS_KEY='lmw_memos';
+function loadSongs(){try{const d=localStorage.getItem(SONGS_KEY);return d?JSON.parse(d):[];}catch(e){return[]}}
+function saveSongs(){try{localStorage.setItem(SONGS_KEY,JSON.stringify(songs))}catch(e){}}
+function loadIdeas(){try{const d=localStorage.getItem(IDEAS_KEY);return d?JSON.parse(d):[];}catch(e){return[]}}
+function saveIdeas(){try{localStorage.setItem(IDEAS_KEY,JSON.stringify(ideas))}catch(e){}}
+function loadMemos(){try{const d=localStorage.getItem(MEMOS_KEY);return d?JSON.parse(d):[];}catch(e){return[]}}
+function saveMemos(){try{localStorage.setItem(MEMOS_KEY,JSON.stringify(memos))}catch(e){}}
+
+let songs=loadSongs(), ideas=loadIdeas(), memos=loadMemos();
+let eqCat='vocals',eqInst=CATS.vocals.insts[0];
+let compCat='vocals',compInst=CATS.vocals.insts[0];
+let fxCat='vocals',fxInst=CATS.vocals.insts[0];
+let gsCat='channels', mixCat='prep';
+let mediaRecorder=null, audioChunks=[], currentBlob=null, isRecording=false;
+let activeAudio=null, activeMemoId=null;
+
+function td(){const n=new Date();return n.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+
+function renderSongs(){
+  const c=document.getElementById('scont');
+  if(!songs.length){c.innerHTML='<div class="empty">No songs yet — tap + New</div>';return}
+  c.innerHTML=songs.map(s=>`<div class="scard ${s.status}" data-songid="${s.id}"><div class="scardh"><div class="sname">${s.title}</div><span class="stag t${s.status}">${s.status==='wip'?'WIP':s.status}</span></div><div class="smeta">${s.genre} · ${s.key}</div><div class="sprev">${s.lyrics.replace(/\[.*?\]\n?/g,'').trim()}</div></div>`).join('');
+}
+
+document.addEventListener('click',function(e){
+  const sc=e.target.closest('.scard[data-songid]');
+  if(sc){openSong(parseInt(sc.dataset.songid));return}
+  const ct=e.target.closest('.ctab');
+  if(ct){
+    const sec=ct.dataset.section,cat=ct.dataset.cat;
+    if(sec==='eq'){eqCat=cat;eqInst=CATS[cat].insts[0];setupEQ()}
+    else if(sec==='comp'){compCat=cat;compInst=CATS[cat].insts[0];setupComp()}
+    else if(sec==='fx'){fxCat=cat;fxInst=CATS[cat].insts[0];setupFX()}
+    else if(sec==='gs'){gsCat=cat;renderGS()}
+    else if(sec==='mix'){mixCat=cat;renderMix()}
+    return;
+  }
+  const it=e.target.closest('.itab');
+  if(it){
+    const sec=it.dataset.section,idx=parseInt(it.dataset.idx);
+    if(sec==='eq'){eqInst=CATS[eqCat].insts[idx];renderInstTabs('eq-insts',CATS[eqCat].insts,eqInst,'eq');renderEQ()}
+    else if(sec==='comp'){compInst=CATS[compCat].insts[idx];renderInstTabs('comp-insts',CATS[compCat].insts,compInst,'comp');renderComp()}
+    else if(sec==='fx'){fxInst=CATS[fxCat].insts[idx];renderInstTabs('fx-insts',CATS[fxCat].insts,fxInst,'fx');renderFX()}
+    return;
+  }
+  const st=e.target.closest('.stab');
+  if(st){
+    const sub=st.dataset.sub;
+    document.querySelectorAll('.stab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.subsec').forEach(x=>x.classList.remove('on'));
+    st.classList.add('on');
+    document.getElementById('sub-'+sub).classList.add('on');
+    return;
+  }
+  const md=e.target.closest('.vm-del');
+  if(md){
+    const id=parseInt(md.dataset.id);
+    memos=memos.filter(m=>m.id!==id);
+    saveMemos();renderMemos();return;
+  }
+  const mp=e.target.closest('.vm-play');
+  if(mp){
+    const id=parseInt(mp.dataset.id);
+    const memo=memos.find(m=>m.id===id);
+    if(!memo)return;
+    if(activeAudio && activeMemoId===id){
+      activeAudio.pause();activeAudio=null;activeMemoId=null;
+      mp.textContent='▶';return;
+    }
+    if(activeAudio){activeAudio.pause();activeAudio=null;
+      document.querySelectorAll('.vm-play').forEach(b=>{if(parseInt(b.dataset.id)===activeMemoId)b.textContent='▶'});
+    }
+    const audio=new Audio(memo.url);
+    const prog=document.getElementById('prog-'+id);
+    const timeEl=document.getElementById('time-'+id);
+    audio.ontimeupdate=()=>{
+      if(audio.duration){prog.style.width=(audio.currentTime/audio.duration*100)+'%';
+      const r=Math.floor(audio.duration-audio.currentTime);
+      timeEl.textContent=Math.floor(r/60)+':'+(r%60<10?'0':'')+r%60;}
+    };
+    audio.onended=()=>{mp.textContent='▶';prog.style.width='0%';activeAudio=null;activeMemoId=null};
+    audio.play();activeAudio=audio;activeMemoId=id;mp.textContent='■';
+    return;
+  }
+});
+
+function openSong(id){
+  const s=songs.find(x=>x.id===id);if(!s)return;
+  const lf=s.lyrics.replace(/\[(.+?)\]/g,'<div class="lslbl">$1</div>').replace(/\n/g,'<br>');
+  document.getElementById('sdetcont').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div style="font-size:20px;font-weight:600;margin-bottom:4px">${s.title}</div><div style="font-size:12px;color:var(--muted);font-family:var(--mono)">${s.genre} · ${s.key}</div></div><span class="stag t${s.status}" style="margin-top:4px">${s.status==='wip'?'WIP':s.status}</span></div><div class="lbody">${lf}</div>`;
+  document.getElementById('sdet').classList.add('op');
+  document.getElementById('llist').style.display='none';
+}
+
+function renderIdeas(){
+  const c=document.getElementById('icont');
+  if(!ideas.length){c.innerHTML='<div style="grid-column:1/-1" class="empty">No ideas yet</div>';return}
+  c.innerHTML=ideas.map(i=>`<div class="icard"><div class="ictype">${i.type}</div><div class="ictxt">${i.text}</div><div class="icdate">${i.date}</div></div>`).join('');
+}
+
+function renderMemos(){
+  const c=document.getElementById('memo-cont');
+  if(!memos.length){c.innerHTML='<div class="empty">No voice memos yet</div>';return}
+  c.innerHTML=memos.map(m=>{
+    const dur=m.duration?Math.floor(m.duration)+'s':'—';
+    return `<div class="vm-card">
+      <div class="vm-top"><div class="vm-title">${m.name}</div><div class="vm-date">${m.date} · ${dur}</div></div>
+      <div class="vm-player">
+        <button class="vm-play" data-id="${m.id}">▶</button>
+        <div class="vm-bar"><div class="vm-progress" id="prog-${m.id}"></div></div>
+        <div class="vm-time" id="time-${m.id}">0:${dur!=='—'?dur.replace('s',''):'00'}</div>
+      </div>
+      ${m.note?`<div class="vm-note">${m.note}</div>`:''}
+      <button class="vm-del" data-id="${m.id}">Delete</button>
+    </div>`;
+  }).join('');
+}
+
+const recBtn=document.getElementById('rec-btn');
+const recLabel=document.getElementById('rec-label');
+const memoNameRow=document.getElementById('memo-name-row');
+
+recBtn.addEventListener('mousedown',startRec);
+recBtn.addEventListener('touchstart',e=>{e.preventDefault();startRec()},{passive:false});
+recBtn.addEventListener('mouseup',stopRec);
+recBtn.addEventListener('touchend',e=>{e.preventDefault();stopRec()},{passive:false});
+
+async function startRec(){
+  if(isRecording)return;
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream);
+    audioChunks=[];
+    mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+    mediaRecorder.start();
+    isRecording=true;
+    recBtn.classList.add('recording');
+    recLabel.textContent='Recording... Release to stop';
+  }catch(err){
+    alert('Microphone access required for voice memos. Please allow microphone access in your browser settings.');
+  }
+}
+
+function stopRec(){
+  if(!isRecording||!mediaRecorder)return;
+  mediaRecorder.stop();
+  mediaRecorder.stream.getTracks().forEach(t=>t.stop());
+  isRecording=false;
+  recBtn.classList.remove('recording');
+  recLabel.textContent='Hold to Record';
+  mediaRecorder.onstop=()=>{
+    currentBlob=new Blob(audioChunks,{type:'audio/webm'});
+    memoNameRow.style.display='block';
+    document.getElementById('memo-name-inp').value='';
+    document.getElementById('memo-name-inp').focus();
+  };
+}
+
+document.getElementById('memo-save-btn').addEventListener('click',()=>{
+  if(!currentBlob)return;
+  const name=document.getElementById('memo-name-inp').value.trim()||'Untitled Memo';
+  const url=URL.createObjectURL(currentBlob);
+  const audio=new Audio(url);
+  audio.onloadedmetadata=()=>{
+    memos.unshift({id:Date.now(),name,url,date:td(),duration:audio.duration,note:''});
+    saveMemos();renderMemos();
+    memoNameRow.style.display='none';currentBlob=null;
+  };
+  audio.load();
+});
+
+document.getElementById('memo-discard-btn').addEventListener('click',()=>{
+  currentBlob=null;memoNameRow.style.display='none';
+});
+
+function renderCatTabs(cid,cats,active,section){
+  document.getElementById(cid).innerHTML=Object.entries(cats).map(([k,v])=>`<button class="ctab${k===active?' on':''}" data-cat="${k}" data-section="${section}">${v.label}</button>`).join('');
+}
+function renderInstTabs(cid,insts,active,section){
+  document.getElementById(cid).innerHTML=insts.map((i,idx)=>`<button class="itab${i===active?' on':''}" data-idx="${idx}" data-section="${section}">${i}</button>`).join('');
+}
+
+function renderEQ(){
+  const d=EQ[eqInst];if(!d){document.getElementById('eq-body').innerHTML='<div class="empty">Coming soon</div>';return}
+  document.getElementById('eq-body').innerHTML=`<div class="eqcard"><div class="eqtitle">${eqInst}</div>${d.bands.map(b=>`<div class="brow"><div class="blbl">${b.f}</div><div class="btype">${b.t}<br><span style="color:var(--muted);font-size:10px">${b.a}</span></div><div class="bval ${b.c}">${b.v}</div></div>`).join('')}<div class="tiprow"><div class="tiptx">★ ${d.tip}</div></div></div>`;
+}
+function renderComp(){
+  const d=COMP[compInst];if(!d){document.getElementById('comp-body').innerHTML='<div class="empty">Coming soon</div>';return}
+  document.getElementById('comp-body').innerHTML=`<div class="eqcard"><div class="eqtitle" style="color:var(--acc2)">${compInst}</div><div class="cgrid"><div class="cparam"><div class="cplbl">Ratio</div><div class="cpval">${d.ratio}</div></div><div class="cparam"><div class="cplbl">Attack</div><div class="cpval s">${d.attack}</div></div><div class="cparam"><div class="cplbl">Release</div><div class="cpval s">${d.release}</div></div><div class="cparam"><div class="cplbl">Threshold</div><div class="cpval">${d.thresh}</div></div></div><div class="brow" style="margin-bottom:10px"><div class="blbl">GR Target</div><div class="btype">Gain Reduction</div><div class="bval boost">${d.gr}</div></div><div class="cnote">${d.note}</div></div>`;
+}
+
+function renderFX(){
+  const d=FX[fxInst];if(!d){document.getElementById('fx-body').innerHTML='<div class="empty">Coming soon</div>';return}
+  const flow=d.chain.map((n,i)=>{const cls=i===0?'inp':i===d.chain.length-1?'out':'';return`<span class="cnode ${cls}">${n}</span>${i<d.chain.length-1?'<span class="carr">→</span>':''}`}).join('');
+  const plugHtml=d.plugins.map(p=>`
+    <div class="plug-block">
+      <div class="plug-name"><span class="plug-badge ${p.badge}">${p.badge.toUpperCase()}</span>${p.name}</div>
+      ${p.rows.map(r=>`<div class="pdrow"><span class="pdlbl">${r.l}</span><span class="pdval">${r.v}</span></div>`).join('')}
+    </div>`).join('');
+  document.getElementById('fx-body').innerHTML=`<div class="chaincard"><div class="chaintitle" style="color:${d.col}">${fxInst} — Signal Chain</div><div class="chainflow">${flow}</div></div><div style="margin-bottom:6px;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Plugin Settings</div>${plugHtml}`;
+}
+
+function renderGS(){
+  const d=GS[gsCat];
+  const tabs=Object.entries(GS_CATS).map(([k,v])=>`<button class="ctab${k===gsCat?' on':''}" data-cat="${k}" data-section="gs">${v.label}</button>`).join('');
+  document.getElementById('gs-cats').innerHTML=tabs;
+  const meters=d.meters.map(m=>`<div class="gs-meter"><div class="gs-lbl">${m.lbl}</div><div class="gs-bar-wrap"><div class="gs-bar" style="width:${m.bar}%;background:${m.col}"></div></div><div class="gs-val ${m.cls}">${m.v}</div></div>`).join('');
+  const steps=d.steps.map((s,i)=>`<div class="mix-step"><div class="mix-num" style="color:var(--acc5)">${String(i+1).padStart(2,'0')}</div><div class="mix-txt">${s}</div></div>`).join('');
+  document.getElementById('gs-body').innerHTML=`<div class="gs-card"><div class="gs-title">${d.title}</div>${meters}<div class="gs-tip">${d.tip}</div></div><div class="gs-card"><div class="gs-title" style="color:var(--muted)">Step by Step</div>${steps}</div>`;
+}
+
+function renderMix(){
+  const d=MIX[mixCat];
+  const tabs=Object.entries(MIX_CATS).map(([k,v])=>`<button class="ctab${k===mixCat?' on':''}" data-cat="${k}" data-section="mix">${v.label}</button>`).join('');
+  document.getElementById('mix-cats').innerHTML=tabs;
+  const steps=d.steps.map(s=>`<div class="mix-step"><div class="mix-num" style="color:${d.col}">${s.n}</div><div class="mix-txt"><strong style="color:var(--txt);font-weight:500;display:block;margin-bottom:2px">${s.t}</strong>${s.d}</div></div>`).join('');
+  document.getElementById('mix-body').innerHTML=`<div class="mix-card"><div class="mix-title" style="color:${d.col}">${d.title}</div>${steps}</div>`;
+}
+
+function setupEQ(){renderCatTabs('eq-cats',CATS,eqCat,'eq');renderInstTabs('eq-insts',CATS[eqCat].insts,eqInst,'eq');renderEQ()}
+function setupComp(){renderCatTabs('comp-cats',CATS,compCat,'comp');renderInstTabs('comp-insts',CATS[compCat].insts,compInst,'comp');renderComp()}
+function setupFX(){renderCatTabs('fx-cats',CATS,fxCat,'fx');renderInstTabs('fx-insts',CATS[fxCat].insts,fxInst,'fx');renderFX()}
+
+document.getElementById('nav').addEventListener('click',e=>{
+  const b=e.target.closest('.nbtn');
+  if(b){
+    document.querySelectorAll('.nbtn').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');document.getElementById('sec-'+b.dataset.s).classList.add('on');
+    return;
+  }
+  const hdr=e.target.closest('.nav-group-hdr');
+  if(hdr){
+    const grp=document.getElementById('grp-'+hdr.dataset.grp);
+    if(!grp)return;
+    const body=grp.querySelector('.nav-group-body');
+    const isFolded=grp.classList.contains('folded');
+    grp.classList.toggle('folded',!isFolded);
+    grp.classList.toggle('open',isFolded);
+    body.style.maxHeight=isFolded?(body.scrollHeight+50+'px'):'0';
+    return;
+  }
+});
+document.getElementById('nav-toggle').addEventListener('click',()=>{
+  document.getElementById('nav-wrap').classList.toggle('collapsed');
+});
+
+document.getElementById('opn-song').addEventListener('click',()=>document.getElementById('song-modal').classList.add('op'));
+document.getElementById('cx-song').addEventListener('click',()=>document.getElementById('song-modal').classList.remove('op'));
+document.getElementById('sv-song').addEventListener('click',()=>{
+  const t=document.getElementById('si-title').value.trim();if(!t)return;
+  songs.unshift({id:Date.now(),title:t,genre:document.getElementById('si-genre').value||'—',key:document.getElementById('si-key').value||'—',status:document.getElementById('si-status').value,lyrics:document.getElementById('si-lyrics').value||'(no lyrics yet)'});
+  saveSongs();['si-title','si-genre','si-key','si-lyrics'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('song-modal').classList.remove('op');renderSongs();
+});
+document.getElementById('opn-idea').addEventListener('click',()=>document.getElementById('idea-modal').classList.add('op'));
+document.getElementById('cx-idea').addEventListener('click',()=>document.getElementById('idea-modal').classList.remove('op'));
+document.getElementById('sv-idea').addEventListener('click',()=>{
+  const t=document.getElementById('ii-text').value.trim();if(!t)return;
+  ideas.unshift({id:Date.now(),type:document.getElementById('ii-type').value,text:t,date:td()});
+  saveIdeas();document.getElementById('ii-text').value='';
+  document.getElementById('idea-modal').classList.remove('op');renderIdeas();
+});
+document.getElementById('backbtn').addEventListener('click',()=>{
+  document.getElementById('sdet').classList.remove('op');
+  document.getElementById('llist').style.display='';
+});
+
+function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.getHours()+':'+(n.getMinutes()<10?'0':'')+n.getMinutes();}
+updateClock();setInterval(updateClock,30000);
+
+renderSongs();renderIdeas();renderMemos();setupEQ();setupComp();setupFX();renderGS();renderMix();
+
+// CHORDS
+const CHORD_KEYS=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const CHORD_MOODS={
+  happy:{label:'Happy',progs:[['I','IV','V','I'],['I','V','vi','IV'],['I','IV','I','V'],['I','ii','IV','V'],['I','iii','IV','V']]},
+  sad:{label:'Sad',progs:[['vi','IV','I','V'],['i','VII','VI','VII'],['i','iv','v','i'],['vi','V','IV','III'],['i','VI','III','VII']]},
+  dark:{label:'Dark',progs:[['i','VII','VI','v'],['i','iv','VII','III'],['i','v','iv','i'],['i','III','VII','VI'],['i','VI','III','iv']]},
+  epic:{label:'Epic',progs:[['I','V','vi','iii'],['I','IV','vi','V'],['IV','I','V','vi'],['vi','IV','V','I'],['I','VI','III','VII']]},
+  chill:{label:'Chill',progs:[['I','iii','IV','V'],['vi','I','V','IV'],['I','IV','ii','V'],['I','V','IV','IV'],['ii','V','I','I']]},
+  romantic:{label:'Romantic',progs:[['I','vi','IV','V'],['I','iii','vi','IV'],['I','V','vi','iii'],['IV','I','V','vi'],['I','ii','V','I']]},
+  tense:{label:'Tense',progs:[['i','II','V','i'],['i','iv','II','V'],['i','v','ii','V'],['I','II','IV','V'],['i','III','VI','VII']]},
+  groovy:{label:'Groovy',progs:[['I','IV','I','V'],['I','IV','VII','IV'],['I','IV','bVII','IV'],['I','ii','iii','IV'],['I','IV','V','IV']]}
+};
+let chordKey='C',chordMood='happy';
+function renderChords(){
+  document.getElementById('chord-key-tabs').innerHTML=CHORD_KEYS.map(k=>
+    `<button class="ctab${k===chordKey?' on':''}" onclick="chordKey='${k}';renderChords()">${k}</button>`).join('');
+  document.getElementById('chord-mood-tabs').innerHTML=Object.entries(CHORD_MOODS).map(([k,v])=>
+    `<button class="ctab${k===chordMood?' on':''}" onclick="chordMood='${k}';renderChords()">${v.label}</button>`).join('');
+  const mood=CHORD_MOODS[chordMood];
+  document.getElementById('chord-body').innerHTML=mood.progs.map((prog,i)=>`
+    <div class="eqcard" style="margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Progression ${i+1} — Key of ${chordKey}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${prog.map(c=>`<div style="background:var(--surf2);border:1px solid var(--bdr2);border-radius:8px;padding:10px 16px;font-family:var(--mono);font-size:18px;color:var(--acc);font-weight:700">${c}</div>`).join('')}</div>
+    </div>`).join('');
+}
+try{renderChords();}catch(e){console.warn('renderChords',e)}
+
+// CALENDAR
+const EVENTS_KEY='lmw_events';
+function loadEvents(){try{const d=localStorage.getItem(EVENTS_KEY);return d?JSON.parse(d):[]}catch(e){return[]}}
+function saveEvents(){try{localStorage.setItem(EVENTS_KEY,JSON.stringify(events))}catch(e){}}
+let events=loadEvents();
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),selectedDate=null;
+const EV_COLORS={session:'#c8f064',deadline:'#f064a8',release:'#64d4f0',collab:'#a064f0',rehearsal:'#f0a064',gig:'#f064a8',other:'#888a94'};
+function calKey(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
+function renderCalendar(){
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  document.getElementById('cal-month').textContent=`${MONTHS[calMonth]} ${calYear}`;
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const n=new Date();const tk=calKey(n.getFullYear(),n.getMonth(),n.getDate());
+  let html=DAYS.map(d=>`<div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);padding:4px 0">${d}</div>`).join('');
+  for(let i=0;i<firstDay;i++)html+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const k=calKey(calYear,calMonth,d);
+    const evs=events.filter(e=>e.date===k);
+    const isToday=k===tk,isSel=k===selectedDate;
+    const dots=evs.slice(0,3).map(e=>`<div style="width:4px;height:4px;border-radius:50%;background:${EV_COLORS[e.type]||'#888'}"></div>`).join('');
+    html+=`<div onclick="selectedDate='${k}';renderCalendar()" style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;font-size:12px;background:${isSel?'var(--acc)':isToday?'rgba(200,240,100,.15)':'transparent'};color:${isSel?'#0d0e12':isToday?'var(--acc)':'var(--muted)'};border:1px solid ${isSel?'var(--acc)':isToday?'rgba(200,240,100,.3)':'transparent'};gap:2px;padding:2px"><span>${d}</span><div style="display:flex;gap:1px">${dots}</div></div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+  document.getElementById('cal-sel-label').textContent=selectedDate?`Events — ${selectedDate}`:'Select a day';
+  if(selectedDate){
+    const dayEvs=events.filter(e=>e.date===selectedDate);
+    document.getElementById('cal-events-list').innerHTML=dayEvs.length?dayEvs.map(e=>`<div style="background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600;color:var(--txt)">${e.title}</div><button onclick="events=events.filter(x=>x.id!==${e.id});saveEvents();renderCalendar()" style="background:none;border:none;color:var(--acc3);font-size:11px;cursor:pointer;font-family:var(--mono)">Delete</button></div>${e.time?`<div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px">${e.time}</div>`:''}<div style="font-size:10px;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:6px;background:rgba(255,255,255,.05);color:${EV_COLORS[e.type]||'#888'};font-family:var(--mono)">${e.type}</div></div>`).join(''):'<div class="empty" style="padding:20px">No events this day</div>';
+  } else document.getElementById('cal-events-list').innerHTML='';
+}
+document.getElementById('cal-prev').addEventListener('click',()=>{calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar()});
+document.getElementById('cal-next').addEventListener('click',()=>{calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar()});
+document.getElementById('opn-event').addEventListener('click',()=>{if(selectedDate)document.getElementById('ev-date').value=selectedDate;document.getElementById('event-modal').classList.add('op')});
+document.getElementById('cx-event').addEventListener('click',()=>document.getElementById('event-modal').classList.remove('op'));
+document.getElementById('sv-event').addEventListener('click',()=>{
+  const t=document.getElementById('ev-title').value.trim();const dt=document.getElementById('ev-date').value;if(!t||!dt)return;
+  events.push({id:Date.now(),title:t,date:dt,time:document.getElementById('ev-time').value,type:document.getElementById('ev-type').value});
+  events.sort((a,b)=>a.date.localeCompare(b.date));saveEvents();
+  ['ev-title','ev-time'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('event-modal').classList.remove('op');renderCalendar();
+});
+try{renderCalendar();}catch(e){console.warn('renderCalendar',e)}
+
+// TODO
+const TODO_KEY='lmw_todos';
+function loadTodos(){try{const d=localStorage.getItem(TODO_KEY);return d?JSON.parse(d):{music:[],life:[],school:[]}}catch(e){return{music:[],life:[],school:[]}}}
+function saveTodos(){try{localStorage.setItem(TODO_KEY,JSON.stringify(todos))}catch(e){}}
+let todos=loadTodos();
+if(!todos.music)todos.music=[];if(!todos.life)todos.life=[];if(!todos.school)todos.school=[];
+let currentList='music';
+function renderTodos(){
+  const c=document.getElementById('todo-list');const items=todos[currentList]||[];
+  if(!items.length){c.innerHTML='<div class="empty">No tasks yet — add one above</div>';return}
+  c.innerHTML=items.map((t,i)=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;margin-bottom:8px"><div onclick="todos[currentList][${i}].done=!todos[currentList][${i}].done;saveTodos();renderTodos()" style="width:20px;height:20px;border-radius:50%;border:2px solid ${t.done?'var(--acc)':'var(--bdr2)'};flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:${t.done?'var(--acc)':'transparent'};margin-top:1px">${t.done?'<span style="color:#0d0e12;font-size:11px;font-weight:700">&#10003;</span>':''}</div><div style="flex:1;font-size:13px;color:${t.done?'var(--muted)':'var(--txt)'};text-decoration:${t.done?'line-through':'none'};padding-top:1px">${t.text}</div><button onclick="todos[currentList].splice(${i},1);saveTodos();renderTodos()" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0;line-height:1">&times;</button></div>`).join('');
+}
+document.getElementById('todo-add-btn').addEventListener('click',()=>{
+  const v=document.getElementById('todo-inp').value.trim();if(!v)return;
+  todos[currentList].push({text:v,done:false});saveTodos();document.getElementById('todo-inp').value='';renderTodos();
+});
+document.getElementById('todo-inp').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('todo-add-btn').click()});
+document.querySelectorAll('.todo-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.todo-tab').forEach(x=>{x.style.background='var(--surf)';x.style.color='var(--muted)';x.style.borderColor='var(--bdr)'});
+    tab.style.background='rgba(200,240,100,.1)';tab.style.color='var(--acc)';tab.style.borderColor='rgba(200,240,100,.3)';
+    currentList=tab.dataset.list;renderTodos();
+  });
+});
+try{renderTodos();}catch(e){console.warn('renderTodos',e)}
+</script>
+</body>
+</html>
