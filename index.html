@@ -3,7 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LM Workstation">
+<meta name="theme-color" content="#0d0e12">
 <title>Louis Mac Workstation</title>
+<script>
+(function(){
+  var sz=512;
+  var c=document.createElement('canvas');
+  c.width=sz;c.height=sz;
+  var ctx=c.getContext('2d');
+  var r=function(hex){return parseInt(hex.slice(1,3),16)};
+  var g=function(hex){return parseInt(hex.slice(3,5),16)};
+  var b=function(hex){return parseInt(hex.slice(5,7),16)};
+  function rr(x,y,w,h,rad,fill){
+    ctx.beginPath();ctx.roundRect(x,y,w,h,[rad]);ctx.fillStyle=fill;ctx.fill();
+  }
+  var S=sz/300;
+  rr(0,0,sz,sz,S*60,'#0d0e12');
+  rr(S*20,S*20,S*260,S*260,S*48,'#16181f');
+  rr(S*34,S*34,S*232,S*232,S*40,'rgba(0,0,0,0.5)');
+  var bars=[
+    [50,172,8,36,'#c8f064'],[66,148,8,60,'#c8f064'],[82,160,8,48,'#64d4f0'],
+    [98,132,8,76,'#c8f064'],[114,154,8,52,'#64d4f0'],[130,116,8,88,'#c8f064'],
+    [146,142,8,62,'#f064a8'],[162,124,8,80,'#c8f064'],[178,152,8,54,'#64d4f0'],
+    [194,138,8,68,'#c8f064'],[210,158,8,44,'#a064f0'],[226,146,8,58,'#c8f064'],
+    [242,166,8,38,'#64d4f0']
+  ];
+  var cols=['#c8f064','#c8f064','#64d4f0','#c8f064','#64d4f0','#c8f064','#f064a8','#c8f064','#64d4f0','#c8f064','#a064f0','#c8f064','#64d4f0'];
+  for(var i=0;i<13;i++){
+    rr(S*(50+i*16),S*92,S*8,S*116,S*4,'#16181f');
+  }
+  for(var i=0;i<bars.length;i++){
+    var bx=bars[i];rr(S*bx[0],S*bx[1],S*bx[2],S*bx[3],S*4,bx[4]);
+  }
+  ctx.beginPath();ctx.setLineDash([S*4,S*3]);ctx.strokeStyle='rgba(200,240,100,0.35)';ctx.lineWidth=S*1.5;ctx.moveTo(S*44,S*150);ctx.lineTo(S*256,S*150);ctx.stroke();ctx.setLineDash([]);
+  var knobs=[
+    [58,248,'#c8f064'],[82,248,'#16181f'],[106,248,'#64d4f0'],[130,248,'#16181f'],
+    [154,248,'#f064a8'],[178,248,'#16181f'],[202,248,'#a064f0'],[226,248,'#16181f']
+  ];
+  for(var i=0;i<knobs.length;i++){
+    var k=knobs[i];
+    ctx.beginPath();ctx.arc(S*k[0],S*k[1],S*6,0,Math.PI*2);
+    ctx.fillStyle=k[2];ctx.fill();
+    if(k[2]==='#16181f'){ctx.strokeStyle='#888a94';ctx.lineWidth=S*1.5;ctx.stroke();}
+  }
+  var waveX=[44,50,56,62,68,74,80,86,92];
+  var waveH=[12,6,14,8,16,10,12,6,15];
+  var waveC=['#c8f064','#c8f064','#c8f064','#c8f064','#64d4f0','#c8f064','#c8f064','#64d4f0','#c8f064'];
+  rr(S*38,S*62,S*224,S*22,S*4,'rgba(0,0,0,0.5)');
+  for(var i=0;i<waveX.length;i++){
+    rr(S*waveX[i],S*(67+(16-waveH[i])/2),S*3,S*waveH[i],S*1,waveC[i]);
+  }
+  rr(S*110,S*62,S*150,S*24,S*5,'#c8f064');
+  ctx.font='bold '+Math.round(S*11)+'px "Courier New", monospace';
+  ctx.fillStyle='#0d0e12';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('LM WORKSTATION',S*185,S*75);
+  var dataURL=c.toDataURL('image/png');
+  var link=document.createElement('link');
+  link.rel='apple-touch-icon';link.href=dataURL;
+  document.head.appendChild(link);
+  var link2=document.createElement('link');
+  link2.rel='icon';link2.type='image/png';link2.href=dataURL;
+  document.head.appendChild(link2);
+})();
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0d0e12;--surf:#16181f;--surf2:#1e2028;--bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.13);--acc:#c8f064;--acc2:#64d4f0;--acc3:#f064a8;--acc4:#a064f0;--acc5:#f0a064;--txt:#f0f0ee;--muted:#888a94;--mono:'Courier New',Courier,monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
