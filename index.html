@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Louis Mac Workstation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0d0e12;--surf:#16181f;--surf2:#1e2028;--bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.13);--acc:#c8f064;--acc2:#64d4f0;--acc3:#f064a8;--acc4:#a064f0;--acc5:#f0a064;--txt:#f0f0ee;--muted:#888a94;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+:root{--bg:#0d0e12;--surf:#16181f;--surf2:#1e2028;--bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.13);--acc:#c8f064;--acc2:#64d4f0;--acc3:#f064a8;--acc4:#a064f0;--acc5:#f0a064;--txt:#f0f0ee;--muted:#888a94;--mono:'Courier New',Courier,monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 html,body{height:100%;background:var(--bg);font-family:var(--sans);color:var(--txt);overscroll-behavior:none}
 .app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
 .sb{background:var(--bg);padding:14px 20px 4px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
@@ -275,7 +273,6 @@ html,body{height:100%;background:var(--bg);font-family:var(--sans);color:var(--t
   <div id="cal-events-list"></div>
 </div>
 
-</div>
 </div>
 </div>
 
@@ -943,7 +940,14 @@ document.getElementById('backbtn').addEventListener('click',()=>{
 function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.getHours()+':'+(n.getMinutes()<10?'0':'')+n.getMinutes();}
 updateClock();setInterval(updateClock,30000);
 
-renderSongs();renderIdeas();renderMemos();setupEQ();setupComp();setupFX();renderGS();renderMix();
+try{renderSongs();}catch(e){console.warn('renderSongs',e)}
+try{renderIdeas();}catch(e){console.warn('renderIdeas',e)}
+try{renderMemos();}catch(e){console.warn('renderMemos',e)}
+try{setupEQ();}catch(e){console.warn('setupEQ',e)}
+try{setupComp();}catch(e){console.warn('setupComp',e)}
+try{setupFX();}catch(e){console.warn('setupFX',e)}
+try{renderGS();}catch(e){console.warn('renderGS',e)}
+try{renderMix();}catch(e){console.warn('renderMix',e)}
 
 const EVENTS_KEY='lmw_events';
 function loadEvents(){try{const d=localStorage.getItem(EVENTS_KEY);return d?JSON.parse(d):[]}catch(e){return[]}}
@@ -1066,7 +1070,7 @@ document.getElementById('cal-events-list').addEventListener('click',e=>{
   saveEvents();renderCalendar();
 });
 
-renderCalendar();
+try{renderCalendar();}catch(e){console.warn('renderCalendar',e)}
 </script>
 </body>
 </html>
