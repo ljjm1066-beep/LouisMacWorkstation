@@ -1467,4 +1467,10 @@ document.getElementById('todo-add-btn').addEventListener('click',()=>{
 });
 
 document.getElementById('todo-inp').addEventListener('keydown',e=>{
-  if(e.key==='Ente
+  if(e.key==='Enter'){document.getElementById('todo-add-btn').click();}
+});
+
+try{renderTodos();}catch(e){console.warn('renderTodos',e)}
+</script>
+</body>
+</html>
